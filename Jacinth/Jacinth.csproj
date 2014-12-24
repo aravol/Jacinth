@@ -30,8 +30,23 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Components\Component.cs" />
+    <Compile Include="Components\ComponentTypeKey.cs" />
+    <Compile Include="Components\KeyingComponentAttribute.cs" />
+    <Compile Include="Entities\ComponentRemovedEventArgs.cs" />
+    <Compile Include="Entities\Entity.cs" />
+    <Compile Include="Entities\EntityComponentSubset.cs" />
+    <Compile Include="JacinthWorld.cs" />
+    <Compile Include="Processors\AggregateProcessor.cs" />
+    <Compile Include="Processors\JacinthProcessorAttribute.cs" />
+    <Compile Include="Processors\Processor.cs" />
+    <Compile Include="Processors\ProcessorLoop.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

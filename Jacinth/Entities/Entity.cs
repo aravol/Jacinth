@@ -1,0 +1,116 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
+using Jacinth.Components;
+
+namespace Jacinth.Entities
+{
+    /// <summary>
+    /// Basic working object of Jacinth, contains Components to define data and attaches to Processors to define behavior
+    /// </summary>
+    public sealed class Entity
+    {
+        public event EventHandler<ComponentRemovedEventArgs> ComponentRemoved;
+        public event EventHandler ComponentAdded;
+
+        /// <summary>
+        /// The World to which this Entity belongs
+        /// </summary>
+        public JacinthWorld World { get; internal set; }
+
+        /// <summary>
+        /// <para>Gets all Components attached to this Entity.</para>
+        /// <para>WANRING: This is an expensive operation, and unlikely to be optimized in the future. Avoid where possible.</para>
+        /// </summary>
+        public IEnumerable<Component> Components
+        {
+            get
+            {
+                return World.ComponentTable.Keys
+                    .Where(t => t.Item1 == this)
+                    .Select(k => World.ComponentTable[k]);
+            }
+        }
+
+        /// <summary>
+        /// Do not allow objects outside of Jacinth to create Entities
+        /// </summary>
+        internal Entity() { }
+
+        // TODO: Has, Get, Create, and Remove accessors for Components using Keys
+
+        public T AddComponent<T>()
+            where T : Component, new()
+        {
+            var result = new T();
+            AddComponent(result);
+            return result;
+        }
+
+        public void AddComponent<T>(T component)
+            where T : Component
+        {
+            component.Entity = this;
+
+            lock (World.TableLock)
+                World.ComponentTable.Add(
+                    Tuple.Create(this, ComponentTypeKey.GetKey<T>()),
+                    component);
+
+            RaiseComponentAdded();
+        }
+
+        public T GetComponent<T>()
+            where T : Component
+        {
+            return (T)(World.ComponentTable[Tuple.Create(this, ComponentTypeKey.GetKey<T>())]);
+        }
+
+        public T GetOrCreateComponent<T>()
+            where T : Component, new()
+        {
+            var key = Tuple.Create(this, ComponentTypeKey.GetKey<T>());
+            Component result;
+            if (World.ComponentTable.TryGetValue(key, out result))
+                return (T) result; // Hard cast to propogate an InvalidCastException if used incorrectly
+            else
+                return AddComponent<T>();
+        }
+
+        public bool HasComponent<T>()
+            where T : Component
+        {
+            var key = Tuple.Create(this, ComponentTypeKey.GetKey<T>());
+            return World.ComponentTable.ContainsKey(key);
+        }
+
+        public void RemoveComponent<T>()
+            where T : Component
+        {
+            var typeKey = ComponentTypeKey.GetKey<T>();
+            var key = Tuple.Create(this, typeKey);
+
+            lock(World.TableLock)
+                World.ComponentTable.Remove(key);
+
+            RaiseComponentRemoved(typeKey);
+        }
+
+        private void RaiseComponentRemoved(ComponentTypeKey key)
+        {
+            if (ComponentRemoved != null)
+                // Run via a Task so that this thread doesn't wait
+                Task.Run(() => ComponentRemoved.Invoke(this, new ComponentRemovedEventArgs(this, key)));
+        }
+
+        private void RaiseComponentAdded()
+        {
+            if (ComponentAdded != null)
+                // Run via a Task so that this thread doesn't wait
+                Task.Run(() => ComponentAdded.Invoke(this, EventArgs.Empty));
+        }
+    }
+}
