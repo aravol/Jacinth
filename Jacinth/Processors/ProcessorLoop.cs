@@ -80,6 +80,8 @@ namespace Jacinth.Processors
         public void AddProcessor(Processor proc)
         {
             if (World.Initialized) throw new InvalidOperationException();
+
+            _processors.Add(proc);
         }
     }
 }

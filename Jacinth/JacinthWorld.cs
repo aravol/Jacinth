@@ -134,7 +134,9 @@ namespace Jacinth
         {
             foreach (var procType in AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(a => a.GetTypes())
-                .Where(t => t.IsSubclassOf(typeof (ProcessorLoop))))
+                .Where(t => t.IsSubclassOf(typeof (Processor))
+                    && t.IsAbstract == false
+                    && t.ContainsGenericParameters == false))
                 // TODO: Filter out Processors in the same inheritance chain
             {
                 var loopAtt = procType.GetCustomAttribute<JacinthProcessorAttribute>();

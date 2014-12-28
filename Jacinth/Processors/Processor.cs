@@ -73,6 +73,11 @@ namespace Jacinth.Processors
             get { return _activeEntities.Keys; }
         }
 
+        protected IEnumerable<T> ActiveEntityData
+        {
+            get { return _activeEntities.Values; }
+        }
+
         protected Processor(JacinthWorld world) : base(world) { }
 
         /// <summary>
