@@ -11,7 +11,7 @@ namespace Jacinth.Entities
     /// <summary>
     /// Basic working object of Jacinth, contains Components to define data and attaches to Processors to define behavior
     /// </summary>
-    public sealed class Entity
+    public sealed class Entity : IDisposable
     {
         public event EventHandler<ComponentRemovedEventArgs> ComponentRemoved;
         public event EventHandler ComponentAdded;
@@ -111,6 +111,19 @@ namespace Jacinth.Entities
             if (ComponentAdded != null)
                 // Run via a Task so that this thread doesn't wait
                 Task.Run(() => ComponentAdded.Invoke(this, EventArgs.Empty));
+        }
+
+        public void Dispose()
+        {
+            foreach(var key in World.ComponentTable
+                .Keys
+                .Where(t => t.Item1 == this))
+            {
+                lock (World.TableLock)
+                    World.ComponentTable.Remove(key);
+
+                RaiseComponentRemoved(key.Item2);
+            }
         }
     }
 }
