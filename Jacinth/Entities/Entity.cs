@@ -38,7 +38,12 @@ namespace Jacinth.Entities
         /// <summary>
         /// Do not allow objects outside of Jacinth to create Entities
         /// </summary>
-        internal Entity() { }
+        internal Entity()
+        {
+            // Attach no-op event handlers to prevent event raise errors
+            ComponentAdded += (sender, args) => { };
+            ComponentRemoved += (sender, args) => { };
+        }
 
         // TODO: Has, Get, Create, and Remove accessors for Components using Keys
 
@@ -101,23 +106,21 @@ namespace Jacinth.Entities
 
         private void RaiseComponentRemoved(ComponentTypeKey key)
         {
-            if (ComponentRemoved != null)
-                // Run via a Task so that this thread doesn't wait
-                Task.Run(() => ComponentRemoved.Invoke(this, new ComponentRemovedEventArgs(this, key)));
+            Task.Run(() => ComponentRemoved.Invoke(this, new ComponentRemovedEventArgs(this, key)));
         }
 
         private void RaiseComponentAdded()
         {
-            if (ComponentAdded != null)
-                // Run via a Task so that this thread doesn't wait
-                Task.Run(() => ComponentAdded.Invoke(this, EventArgs.Empty));
+            Task.Run(() => ComponentAdded.Invoke(this, EventArgs.Empty));
         }
 
         public void Dispose()
         {
-            foreach(var key in World.ComponentTable
+            foreach(var key in World
+                .ComponentTable
                 .Keys
-                .Where(t => t.Item1 == this))
+                .Where(k => k.Item1 == this)
+                .ToArray())
             {
                 lock (World.TableLock)
                     World.ComponentTable.Remove(key);
