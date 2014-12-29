@@ -13,13 +13,17 @@ namespace Jacinth.Entities
     /// </summary>
     public sealed class Entity : IDisposable
     {
+        private readonly JacinthWorld _world;
+        private readonly int _hashCode;
+        private readonly Guid _id;
+
         public event EventHandler<ComponentRemovedEventArgs> ComponentRemoved;
         public event EventHandler ComponentAdded;
 
         /// <summary>
         /// The World to which this Entity belongs
         /// </summary>
-        public JacinthWorld World { get; internal set; }
+        public JacinthWorld World { get { return _world; } }
 
         /// <summary>
         /// <para>Gets all Components attached to this Entity.</para>
@@ -38,8 +42,12 @@ namespace Jacinth.Entities
         /// <summary>
         /// Do not allow objects outside of Jacinth to create Entities
         /// </summary>
-        internal Entity()
+        internal Entity(JacinthWorld world)
         {
+            _world = world;
+            _id = Guid.NewGuid();
+            _hashCode = _id.GetHashCode();
+
             // Attach no-op event handlers to prevent event raise errors
             ComponentAdded += (sender, args) => { };
             ComponentRemoved += (sender, args) => { };
@@ -127,6 +135,17 @@ namespace Jacinth.Entities
 
                 RaiseComponentRemoved(key.Item2);
             }
+        }
+
+        public override int GetHashCode()
+        {
+            return _hashCode;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Entity
+                && ((Entity)(obj))._id == this._id;
         }
     }
 }

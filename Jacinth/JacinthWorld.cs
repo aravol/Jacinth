@@ -120,7 +120,7 @@ namespace Jacinth
         /// <returns>The newly created Entity</returns>
         public Entity CreateEntity()
         {
-            var result = new Entity {World = this};
+            var result = new Entity(this);
 
             result.ComponentAdded += (sender, e) =>
             {
