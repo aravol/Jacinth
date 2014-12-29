@@ -9,9 +9,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("Jacinth Entity System")]
 [assembly: AssemblyCompany("Aravol")]
 [assembly: AssemblyProduct("Jacinth")]
-[assembly: AssemblyCopyright("Eclipse Public License 2014")]
-[assembly: AssemblyVersion("0.0.1.0")]
-[assembly: AssemblyFileVersion("0.0.1.0")]
+[assembly: AssemblyCopyright("Eclipse Public License - v 1.0")]
+[assembly: AssemblyVersion("0.1.0.0")]
+[assembly: AssemblyFileVersion("0.1.0.0")]
 
 [assembly: Guid("3d574737-a912-44d8-8e9b-da9b2a61f981")]
 
