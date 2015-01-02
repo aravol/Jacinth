@@ -8,7 +8,7 @@ namespace Jacinth.Components
     /// </summary>
     // These are implemented as a sealed class instead of a struct due to lifetime concerns
     //  - a ComponentKey should exist for the lifetime of the entire application
-    public sealed class ComponentTypeKey
+    public sealed class ComponentTypeKey : IEquatable<ComponentTypeKey>
     {
         /// <summary>
         /// Statically caches and accesses the Component Key associated with the type T
@@ -59,10 +59,10 @@ namespace Jacinth.Components
             return _hash;
         }
 
-        public override bool Equals(object obj)
+        public bool Equals(ComponentTypeKey other)
         {
             // Becuase they are tied to a type via an Attribute, logical and referential equality should always be the same for ComponentKeys
-            return ReferenceEquals(this, obj);
+            return ReferenceEquals(this, other);
         }
     }
 }

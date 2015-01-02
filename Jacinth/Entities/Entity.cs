@@ -11,7 +11,7 @@ namespace Jacinth.Entities
     /// <summary>
     /// Basic working object of Jacinth, contains Components to define data and attaches to Processors to define behavior
     /// </summary>
-    public sealed class Entity : IDisposable
+    public sealed class Entity : IDisposable, IEquatable<Entity>
     {
         private readonly JacinthWorld _world;
         private readonly int _hashCode;
@@ -122,6 +122,9 @@ namespace Jacinth.Entities
             Task.Run(() => ComponentAdded.Invoke(this, EventArgs.Empty));
         }
 
+        /// <summary>
+        /// Removes all Components from this Entity
+        /// </summary>
         public void Dispose()
         {
             foreach(var key in World
@@ -140,6 +143,11 @@ namespace Jacinth.Entities
         public override int GetHashCode()
         {
             return _hashCode;
+        }
+
+        public bool Equals(Entity other)
+        {
+            return this._id == other._id;
         }
 
         public override bool Equals(object obj)
