@@ -109,10 +109,15 @@ namespace Jacinth
         }
         #endregion
 
+        #region Constructors
+
         public JacinthWorld(bool initialize = false)
         {
             if (initialize) Initialize();
         }
+        #endregion
+
+        #region Methods
 
         /// <summary>
         /// Creates an Entity in this World
@@ -169,5 +174,6 @@ namespace Jacinth
 
             return result;
         }
+        #endregion
     }
 }
