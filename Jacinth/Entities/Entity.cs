@@ -34,7 +34,7 @@ namespace Jacinth.Entities
             get
             {
                 return World.ComponentTable.Keys
-                    .Where(t => t.Item1 == this)
+                    .Where(t => t.Entity.Equals(this))
                     .Select(k => World.ComponentTable[k]);
             }
         }
@@ -70,7 +70,7 @@ namespace Jacinth.Entities
 
             lock (World.TableLock)
                 World.ComponentTable.Add(
-                    Tuple.Create(this, ComponentTypeKey.GetKey<T>()),
+                    new EntityComponentKey(this, ComponentTypeKey.GetKey<T>()),
                     component);
 
             RaiseComponentAdded();
@@ -79,13 +79,13 @@ namespace Jacinth.Entities
         public T GetComponent<T>()
             where T : Component
         {
-            return (T)(World.ComponentTable[Tuple.Create(this, ComponentTypeKey.GetKey<T>())]);
+            return (T)(World.ComponentTable[new EntityComponentKey(this, ComponentTypeKey.GetKey<T>())]);
         }
 
         public T GetOrCreateComponent<T>()
             where T : Component, new()
         {
-            var key = Tuple.Create(this, ComponentTypeKey.GetKey<T>());
+            var key = new EntityComponentKey(this, ComponentTypeKey.GetKey<T>());
             Component result;
             if (World.ComponentTable.TryGetValue(key, out result))
                 return (T) result; // Hard cast to propogate an InvalidCastException if used incorrectly
@@ -96,7 +96,7 @@ namespace Jacinth.Entities
         public bool HasComponent<T>()
             where T : Component
         {
-            var key = Tuple.Create(this, ComponentTypeKey.GetKey<T>());
+            var key = new EntityComponentKey(this, ComponentTypeKey.GetKey<T>());
             return World.ComponentTable.ContainsKey(key);
         }
 
@@ -104,7 +104,7 @@ namespace Jacinth.Entities
             where T : Component
         {
             var typeKey = ComponentTypeKey.GetKey<T>();
-            var key = Tuple.Create(this, typeKey);
+            var key = new EntityComponentKey(this, typeKey);
 
             lock(World.TableLock)
                 World.ComponentTable.Remove(key);
@@ -130,13 +130,13 @@ namespace Jacinth.Entities
             foreach(var key in World
                 .ComponentTable
                 .Keys
-                .Where(k => k.Item1 == this)
+                .Where(k => k.Entity.Equals(this))
                 .ToArray())
             {
                 lock (World.TableLock)
                     World.ComponentTable.Remove(key);
 
-                RaiseComponentRemoved(key.Item2);
+                RaiseComponentRemoved(key.ComponentType);
             }
         }
 
@@ -148,12 +148,6 @@ namespace Jacinth.Entities
         public bool Equals(Entity other)
         {
             return this._id == other._id;
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is Entity
-                && ((Entity)(obj))._id == this._id;
         }
     }
 }

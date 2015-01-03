@@ -38,6 +38,7 @@
     <Compile Include="Entities\ComponentRemovedEventArgs.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Entities\EntityComponentSubset.cs" />
+    <Compile Include="EntityComponentKey.cs" />
     <Compile Include="JacinthWorld.cs" />
     <Compile Include="Processors\AggregateProcessor.cs" />
     <Compile Include="Processors\JacinthProcessorAttribute.cs" />
