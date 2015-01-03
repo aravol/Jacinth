@@ -6,6 +6,12 @@
 *.user
 *.sln.docstates
 
+# Testbed and Benchmarks
+[Bb]enchmarks/
+[Bb]enchmark/
+[Tt]est[Bb]eds/
+[Tt]est[Bb]ed/
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
