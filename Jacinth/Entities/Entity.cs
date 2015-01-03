@@ -17,8 +17,8 @@ namespace Jacinth.Entities
         private readonly int _hashCode;
         private readonly Guid _id;
 
-        public event EventHandler<ComponentRemovedEventArgs> ComponentRemoved;
-        public event EventHandler ComponentAdded;
+        internal event EventHandler<ComponentRemovedEventArgs> ComponentRemoved;
+        internal event EventHandler ComponentAdded;
 
         /// <summary>
         /// The World to which this Entity belongs
