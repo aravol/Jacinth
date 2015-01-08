@@ -12,7 +12,7 @@ namespace Jacinth
     /// <summary>
     /// Represents a key used to look up a Compoenent of a specific keyed type and a specific Entity
     /// </summary>
-    internal struct EntityComponentKey :
+    internal sealed class EntityComponentKey :
         IEquatable<EntityComponentKey>
     {
         private readonly int _hashCode;
