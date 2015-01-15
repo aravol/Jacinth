@@ -93,6 +93,20 @@ namespace Jacinth.Entities
                 return AddComponent<T>();
         }
 
+        public bool TryGetComponent<T>(out T component)
+            where T : Component
+        {
+            var key = new EntityComponentKey(this, ComponentTypeKey.GetKey<T>());
+            Component rawComponent;
+            bool result;
+            lock (World.TableLock)
+                result = World.ComponentTable.TryGetValue(key, out rawComponent);
+
+            component = rawComponent as T;
+            return result
+                && component != null;
+        }
+
         public bool HasComponent<T>()
             where T : Component
         {

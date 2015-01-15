@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Dynamic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Jacinth.Entities;
@@ -27,10 +28,16 @@ namespace Jacinth.Processors
         /// </summary>
         public ProcessorLoop Loop { get; internal set; }
 
-        public abstract IEnumerable<Entity> ActiveEntities { get; }
-
+        /// <summary>
+        /// Creates a new Processor within the specified World
+        /// </summary>
+        /// <param name="world">The World in which this Processor exists</param>
         protected Processor(JacinthWorld world) { _world = world; }
 
+        /// <summary>
+        /// Precoesses the entities in this Processor
+        /// </summary>
+        /// <param name="deltaTime">The time since the last execution on this Loop</param>
         protected internal abstract void Process(TimeSpan deltaTime);
 
         /// <summary>
@@ -57,7 +64,7 @@ namespace Jacinth.Processors
     /// Processes Entities, providing specific behaviours based on data in the constituent Components
     /// </summary>
     public abstract class Processor<T> : Processor
-        where T : EntityComponentSubset
+        where T : SubEntity
     {
         private readonly Dictionary<Entity, T> _activeEntities = new Dictionary<Entity, T>();
 
@@ -68,26 +75,30 @@ namespace Jacinth.Processors
         /// <summary>
         /// Enumerable of all the Entities currently being processed by this Processor
         /// </summary>
-        public sealed override IEnumerable<Entity> ActiveEntities
+        public IEnumerable<Entity> ActiveEntities
         {
             get { return _activeEntities.Keys; }
         }
 
-        protected IEnumerable<T> ActiveEntityData
+        /// <summary>
+        /// Enumerable of all the Subentities currently being processed by this Processor
+        /// </summary>
+        protected IEnumerable<T> ActiveSubEntities
         {
             get { return _activeEntities.Values; }
         }
 
-        protected Processor(JacinthWorld world) : base(world) { }
+        static Processor()
+        {
+            // Force the static constructors to activate against our specified SubEntity type to ensure it can register the appropriate factory method
+            RuntimeHelpers.RunClassConstructor(typeof(T).TypeHandle);
+        }
 
         /// <summary>
-        /// <para>When overriden in a derived class, verifies if an Entity is valid for this Processor. Invoked when an Entity changes Components</para>
-        /// <para>May be called from outside the context of this Processor's Loop.</para>
+        /// Creates a new Processor within the specified World
         /// </summary>
-        /// <param name="entity">The entity being tested for validity</param>
-        /// <param name="entityComponentSubset">If the Entity is determined valid, this should output the specific type of EntityComponentSubset for this Processo.r</param>
-        /// <returns>True if the Entity is valid for this Processor, False otherwise</returns>
-        protected abstract bool TryGetSubEntity(Entity entity, out T entityComponentSubset);
+        /// <param name="world">The World in which this Processor exists</param>
+        protected Processor(JacinthWorld world) : base(world) { }
 
         internal sealed override void UpdateEntities()
         {
@@ -99,11 +110,14 @@ namespace Jacinth.Processors
                     .Except(_entitiesToRemove)) // If the Entity has already been removed before it was properly added, don't bother with it
                 {
                     T result;
-                    if (TryGetSubEntity(ent, out result))
+                    if (SubEntityFactory.TryGenerateSubEntity<T>(ent, out result))
+                    {
+                        result.Outdated += OnSubEntityOutdated;
                         _activeEntities.Add(ent, result);
+                    }
                 }
 
-                // Iterate and remove everything queued for removal - the EntityComponentSubset has already performed filtering for these
+                // Iterate and remove everything queued for removal - the SubEntity has already performed filtering for these
                 foreach (var ent in _entitiesToRemove
                     .Intersect(ActiveEntities)) // Only remove items actually active to this Processor
                 {
@@ -114,6 +128,14 @@ namespace Jacinth.Processors
                 _entitiesToAdd.Clear();
                 _entitiesToRemove.Clear();
             }
+        }
+
+        private void OnSubEntityOutdated(object sender, SubEntityOutdatedEventArgs args)
+        {
+            QueueEntityRemove(args.Entity);
+
+            // Detach this listener
+            ((SubEntity)(sender)).Outdated -= OnSubEntityOutdated;
         }
 
         internal sealed override void QueueEntityAdd(Entity entity)
