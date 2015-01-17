@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -21,8 +22,7 @@ namespace Jacinth
     {
         #region Values
 
-        private readonly object _tableLock = new object();
-        private readonly Dictionary<EntityComponentKey, Component> _componentTable = new Dictionary<EntityComponentKey, Component>();
+        private readonly ConcurrentDictionary<EntityComponentKey, Component> _componentTable = new ConcurrentDictionary<EntityComponentKey, Component>();
         private readonly Dictionary<string, ProcessorLoop> _processorLoops = new Dictionary<string, ProcessorLoop>();
         private readonly List<Processor> _processors = new List<Processor>();
         #endregion
@@ -32,19 +32,11 @@ namespace Jacinth
         #region Internal
 
         /// <summary>
-        /// Internal object for locking when the ComponentsTable is modified.
-        /// </summary>
-        internal object TableLock
-        {
-            get { return _tableLock; }
-        }
-
-        /// <summary>
         /// Internal storage for Components in Jacinth.
         ///  Highly subject to change, very internal.
         ///  Expect lots of documentation and frequent changes for optimization here.
         /// </summary>
-        internal Dictionary<EntityComponentKey, Component> ComponentTable
+        internal ConcurrentDictionary<EntityComponentKey, Component> ComponentTable
         {
             get { return _componentTable; }
         }

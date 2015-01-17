@@ -85,6 +85,12 @@ namespace Jacinth.Entities
                 return false;
             }
         }
+
+        protected override void OnEntityComponentRemoved(object sender, ComponentRemovedEventArgs e)
+        {
+            if (e.ComponentKey == ComponentTypeKey.GetKey<T1>())
+                RaiseOutdated(new SubEntityOutdatedEventArgs(Entity));
+        }
     }
 
     public class SubEntity<T1, T2> : SubEntity
@@ -124,6 +130,13 @@ namespace Jacinth.Entities
                 subEntity = null;
                 return false;
             }
+        }
+
+        protected override void OnEntityComponentRemoved(object sender, ComponentRemovedEventArgs e)
+        {
+            if (e.ComponentKey == ComponentTypeKey.GetKey<T1>()
+                || e.ComponentKey == ComponentTypeKey.GetKey<T2>())
+                RaiseOutdated(new SubEntityOutdatedEventArgs(Entity));
         }
     }
 

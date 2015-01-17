@@ -11,14 +11,14 @@ namespace Jacinth.Entities
     /// <summary>
     /// Basic working object of Jacinth, contains Components to define data and attaches to Processors to define behavior
     /// </summary>
-    public sealed class Entity : IDisposable, IEquatable<Entity>
+    public sealed class Entity : IEquatable<Entity>
     {
         private readonly JacinthWorld _world;
         private readonly int _hashCode;
         private readonly Guid _id;
 
+        internal event EventHandler<ComponentAddedEventArgs> ComponentAdded;
         internal event EventHandler<ComponentRemovedEventArgs> ComponentRemoved;
-        internal event EventHandler ComponentAdded;
 
         /// <summary>
         /// The World to which this Entity belongs
@@ -68,12 +68,12 @@ namespace Jacinth.Entities
         {
             component.Entity = this;
 
-            lock (World.TableLock)
-                World.ComponentTable.Add(
-                    new EntityComponentKey(this, ComponentTypeKey.GetKey<T>()),
-                    component);
-
-            RaiseComponentAdded();
+            if (World.ComponentTable.TryAdd(
+                new EntityComponentKey(this, ComponentTypeKey.GetKey<T>()),
+                component))
+            {
+                RaiseComponentAdded(component);
+            }
         }
 
         public T GetComponent<T>()
@@ -99,8 +99,8 @@ namespace Jacinth.Entities
             var key = new EntityComponentKey(this, ComponentTypeKey.GetKey<T>());
             Component rawComponent;
             bool result;
-            lock (World.TableLock)
-                result = World.ComponentTable.TryGetValue(key, out rawComponent);
+            
+            result = World.ComponentTable.TryGetValue(key, out rawComponent);
 
             component = rawComponent as T;
             return result
@@ -119,11 +119,10 @@ namespace Jacinth.Entities
         {
             var typeKey = ComponentTypeKey.GetKey<T>();
             var key = new EntityComponentKey(this, typeKey);
+            Component component;
 
-            lock(World.TableLock)
-                World.ComponentTable.Remove(key);
-
-            RaiseComponentRemoved(typeKey);
+            if (World.ComponentTable.TryRemove(key, out component))
+                RaiseComponentRemoved(typeKey);
         }
 
         private void RaiseComponentRemoved(ComponentTypeKey key)
@@ -131,9 +130,9 @@ namespace Jacinth.Entities
             Task.Run(() => ComponentRemoved.Invoke(this, new ComponentRemovedEventArgs(this, key)));
         }
 
-        private void RaiseComponentAdded()
+        private void RaiseComponentAdded(Component component)
         {
-            Task.Run(() => ComponentAdded.Invoke(this, EventArgs.Empty));
+            Task.Run(() => ComponentAdded.Invoke(this, new ComponentAddedEventArgs(this, component)));
         }
 
         /// <summary>
@@ -145,12 +144,12 @@ namespace Jacinth.Entities
                 .ComponentTable
                 .Keys
                 .Where(k => k.Entity.Equals(this))
-                .ToArray())
+                //.ToArray()
+                )
             {
-                lock (World.TableLock)
-                    World.ComponentTable.Remove(key);
-
-                RaiseComponentRemoved(key.ComponentType);
+                Component component;
+                if (World.ComponentTable.TryRemove(key, out component))
+                    RaiseComponentRemoved(key.ComponentType);
             }
         }
 

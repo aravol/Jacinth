@@ -35,6 +35,7 @@
     <Compile Include="Components\Component.cs" />
     <Compile Include="Components\ComponentTypeKey.cs" />
     <Compile Include="Components\KeyingComponentAttribute.cs" />
+    <Compile Include="Entities\ComponentAddedEventArgs.cs" />
     <Compile Include="Entities\ComponentRemovedEventArgs.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Entities\SubEntity.cs" />
