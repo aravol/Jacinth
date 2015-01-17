@@ -14,17 +14,17 @@ namespace Jacinth.Entities
     public class ComponentRemovedEventArgs : EventArgs
     {
         private readonly Entity _entity;
-        private readonly ComponentTypeKey _componentKey;
+        private readonly ComponentTypeKey _componentTypeKey;
         private readonly bool _eraseAll;
 
         public Entity Entity { get { return _entity; } }
-        public ComponentTypeKey ComponentKey { get { return _componentKey; } }
         public bool EraseAll { get { return _eraseAll; } }
+        public ComponentTypeKey ComponentTypeKey { get { return _componentTypeKey; } }
 
         public ComponentRemovedEventArgs(Entity entity, ComponentTypeKey key = null)
         {
             _entity = entity;
-            _componentKey = key;
+            _componentTypeKey = key;
             _eraseAll = key == null;
         }
     }

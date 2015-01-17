@@ -144,13 +144,13 @@ namespace Jacinth.Entities
                 .ComponentTable
                 .Keys
                 .Where(k => k.Entity.Equals(this))
-                //.ToArray()
-                )
+                .ToArray())
             {
                 Component component;
-                if (World.ComponentTable.TryRemove(key, out component))
-                    RaiseComponentRemoved(key.ComponentType);
+                World.ComponentTable.TryRemove(key, out component);
             }
+
+            RaiseComponentRemoved(null);
         }
 
         public override int GetHashCode()

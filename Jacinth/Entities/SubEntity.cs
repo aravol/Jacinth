@@ -88,7 +88,10 @@ namespace Jacinth.Entities
 
         protected override void OnEntityComponentRemoved(object sender, ComponentRemovedEventArgs e)
         {
-            if (e.ComponentKey == ComponentTypeKey.GetKey<T1>())
+            if(e.EraseAll)
+                RaiseOutdated(new SubEntityOutdatedEventArgs(Entity));
+
+            if (e.ComponentTypeKey == ComponentTypeKey.GetKey<T1>())
                 RaiseOutdated(new SubEntityOutdatedEventArgs(Entity));
         }
     }
@@ -134,8 +137,11 @@ namespace Jacinth.Entities
 
         protected override void OnEntityComponentRemoved(object sender, ComponentRemovedEventArgs e)
         {
-            if (e.ComponentKey == ComponentTypeKey.GetKey<T1>()
-                || e.ComponentKey == ComponentTypeKey.GetKey<T2>())
+            if (e.EraseAll)
+                RaiseOutdated(new SubEntityOutdatedEventArgs(Entity));
+
+            if (e.ComponentTypeKey == ComponentTypeKey.GetKey<T1>()
+                || e.ComponentTypeKey == ComponentTypeKey.GetKey<T2>())
                 RaiseOutdated(new SubEntityOutdatedEventArgs(Entity));
         }
     }
@@ -183,6 +189,17 @@ namespace Jacinth.Entities
                 subEntity = null;
                 return false;
             }
+        }
+
+        protected override void OnEntityComponentRemoved(object sender, ComponentRemovedEventArgs e)
+        {
+            if (e.EraseAll)
+                RaiseOutdated(new SubEntityOutdatedEventArgs(Entity));
+
+            if (e.ComponentTypeKey == ComponentTypeKey.GetKey<T1>()
+                || e.ComponentTypeKey == ComponentTypeKey.GetKey<T2>()
+                || e.ComponentTypeKey == ComponentTypeKey.GetKey<T3>())
+                RaiseOutdated(new SubEntityOutdatedEventArgs(Entity));
         }
     }
 
@@ -235,6 +252,18 @@ namespace Jacinth.Entities
                 subEntity = null;
                 return false;
             }
+        }
+
+        protected override void OnEntityComponentRemoved(object sender, ComponentRemovedEventArgs e)
+        {
+            if (e.EraseAll)
+                RaiseOutdated(new SubEntityOutdatedEventArgs(Entity));
+
+            if (e.ComponentTypeKey == ComponentTypeKey.GetKey<T1>()
+                || e.ComponentTypeKey == ComponentTypeKey.GetKey<T2>()
+                || e.ComponentTypeKey == ComponentTypeKey.GetKey<T3>()
+                || e.ComponentTypeKey == ComponentTypeKey.GetKey<T4>())
+                RaiseOutdated(new SubEntityOutdatedEventArgs(Entity));
         }
     }
 
@@ -294,6 +323,19 @@ namespace Jacinth.Entities
                 subEntity = null;
                 return false;
             }
+        }
+
+        protected override void OnEntityComponentRemoved(object sender, ComponentRemovedEventArgs e)
+        {
+            if (e.EraseAll)
+                RaiseOutdated(new SubEntityOutdatedEventArgs(Entity));
+
+            if (e.ComponentTypeKey == ComponentTypeKey.GetKey<T1>()
+                || e.ComponentTypeKey == ComponentTypeKey.GetKey<T2>()
+                || e.ComponentTypeKey == ComponentTypeKey.GetKey<T3>()
+                || e.ComponentTypeKey == ComponentTypeKey.GetKey<T4>()
+                || e.ComponentTypeKey == ComponentTypeKey.GetKey<T5>())
+                RaiseOutdated(new SubEntityOutdatedEventArgs(Entity));
         }
     }
     #endregion
