@@ -122,12 +122,17 @@ namespace Jacinth.Entities
             Component component;
 
             if (World.ComponentTable.TryRemove(key, out component))
-                RaiseComponentRemoved(typeKey);
+                RaiseComponentRemoved(typeKey, component);
         }
 
-        private void RaiseComponentRemoved(ComponentTypeKey key)
+        private void RaiseComponentRemoved(ComponentTypeKey key, Component component)
         {
-            Task.Run(() => ComponentRemoved.Invoke(this, new ComponentRemovedEventArgs(this, key)));
+            Task.Run(() => ComponentRemoved.Invoke(this, new ComponentRemovedEventArgs(this, key, component)));
+        }
+
+        private void RaiseComponentRemoved()
+        {
+            Task.Run(() => ComponentRemoved.Invoke(this, new ComponentRemovedEventArgs(this)));
         }
 
         private void RaiseComponentAdded(Component component)
@@ -150,7 +155,7 @@ namespace Jacinth.Entities
                 World.ComponentTable.TryRemove(key, out component);
             }
 
-            RaiseComponentRemoved(null);
+            RaiseComponentRemoved();
         }
 
         public override int GetHashCode()
