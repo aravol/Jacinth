@@ -148,7 +148,8 @@ namespace Jacinth.Entities
             foreach(var key in World
                 .ComponentTable
                 .Keys
-                .Where(k => k.Entity.Equals(this))
+                .Where(k => k.Entity._hashCode == this._hashCode
+                    && k.Entity.Equals(this))
                 .ToArray())
             {
                 Component component;

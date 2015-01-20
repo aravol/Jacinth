@@ -119,12 +119,13 @@ namespace Jacinth
         {
             var result = new Entity(this);
 
-            result.ComponentAdded += (sender, e) =>
-            {
-                foreach (var p in Processors) p.QueueEntityAdd(result);
-            };
-
+            result.ComponentAdded += OnComponentAdded;
             return result;
+        }
+
+        private void OnComponentAdded(object sender, ComponentAddedEventArgs args)
+        {
+            foreach (var p in Processors.AsParallel()) p.QueueEntityAdd(args.Entity);
         }
 
         public void Initialize()
