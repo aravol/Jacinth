@@ -22,7 +22,8 @@ namespace Jacinth
     {
         #region Values
 
-        private readonly ConcurrentDictionary<EntityComponentKey, Component> _componentTable = new ConcurrentDictionary<EntityComponentKey, Component>();
+        private readonly object _entityLock = new object();
+        private readonly List<Entity> _entities = new List<Entity>();
         private readonly Dictionary<string, ProcessorLoop> _processorLoops = new Dictionary<string, ProcessorLoop>();
         private readonly List<Processor> _processors = new List<Processor>();
         #endregion
@@ -30,17 +31,7 @@ namespace Jacinth
         #region Properties
 
         #region Internal
-
-        /// <summary>
-        /// Internal storage for Components in Jacinth.
-        ///  Highly subject to change, very internal.
-        ///  Expect lots of documentation and frequent changes for optimization here.
-        /// </summary>
-        internal ConcurrentDictionary<EntityComponentKey, Component> ComponentTable
-        {
-            get { return _componentTable; }
-        }
-
+        
         internal Dictionary<string, ProcessorLoop> ProcessorLoopsInternal
         {
             get
@@ -74,12 +65,7 @@ namespace Jacinth
         /// </summary>
         public IEnumerable<Entity> Entities
         {
-            get
-            {
-                return ComponentTable.Keys
-                    .Select(t => t.Entity)
-                    .Distinct();
-            }
+            get { return _entities; }
         }
 
         /// <summary>
@@ -87,7 +73,7 @@ namespace Jacinth
         /// </summary>
         public IEnumerable<Component> Components
         {
-            get { return ComponentTable.Values; }
+            get { return Entities.SelectMany(e => e.Components); }
         }
 
         public IReadOnlyDictionary<string, ProcessorLoop> ProcessorLoops
@@ -119,8 +105,17 @@ namespace Jacinth
         {
             var result = new Entity(this);
 
+            lock (_entityLock)
+                _entities.Add(result);
+
             result.ComponentAdded += OnComponentAdded;
             return result;
+        }
+
+        internal void RemoveEntity(Entity entity)
+        {
+            lock (_entityLock)
+                _entities.Remove(entity);
         }
 
         private void OnComponentAdded(object sender, ComponentAddedEventArgs args)

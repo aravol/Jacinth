@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -17,6 +18,9 @@ namespace Jacinth.Entities
         private readonly int _hashCode;
         private readonly Guid _id;
 
+        private ConcurrentDictionary<ComponentTypeKey, Component> _components
+            = new ConcurrentDictionary<ComponentTypeKey, Component>();
+
         internal event EventHandler<ComponentAddedEventArgs> ComponentAdded;
         internal event EventHandler<ComponentRemovedEventArgs> ComponentRemoved;
 
@@ -31,12 +35,7 @@ namespace Jacinth.Entities
         /// </summary>
         public IEnumerable<Component> Components
         {
-            get
-            {
-                return World.ComponentTable.Keys
-                    .Where(t => t.Entity.Equals(this))
-                    .Select(k => World.ComponentTable[k]);
-            }
+            get {                 return _components.Values;            }
         }
 
         /// <summary>
@@ -68,9 +67,7 @@ namespace Jacinth.Entities
         {
             component.Entity = this;
 
-            if (World.ComponentTable.TryAdd(
-                new EntityComponentKey(this, ComponentTypeKey.GetKey<T>()),
-                component))
+            if (_components.TryAdd(ComponentTypeKey.GetKey<T>(), component))
             {
                 RaiseComponentAdded(component);
             }
@@ -79,15 +76,16 @@ namespace Jacinth.Entities
         public T GetComponent<T>()
             where T : Component
         {
-            return (T)(World.ComponentTable[new EntityComponentKey(this, ComponentTypeKey.GetKey<T>())]);
+            T result;
+            return TryGetComponent<T>(out result) ? null : result;
         }
 
         public T GetOrCreateComponent<T>()
             where T : Component, new()
         {
-            var key = new EntityComponentKey(this, ComponentTypeKey.GetKey<T>());
+            var key = ComponentTypeKey.GetKey<T>();
             Component result;
-            if (World.ComponentTable.TryGetValue(key, out result))
+            if (_components.TryGetValue(key, out result))
                 return (T) result; // Hard cast to propogate an InvalidCastException if used incorrectly
             else
                 return AddComponent<T>();
@@ -96,11 +94,11 @@ namespace Jacinth.Entities
         public bool TryGetComponent<T>(out T component)
             where T : Component
         {
-            var key = new EntityComponentKey(this, ComponentTypeKey.GetKey<T>());
+            var key = ComponentTypeKey.GetKey<T>();
             Component rawComponent;
             bool result;
             
-            result = World.ComponentTable.TryGetValue(key, out rawComponent);
+            result = _components.TryGetValue(key, out rawComponent);
 
             component = rawComponent as T;
             return result
@@ -110,19 +108,18 @@ namespace Jacinth.Entities
         public bool HasComponent<T>()
             where T : Component
         {
-            var key = new EntityComponentKey(this, ComponentTypeKey.GetKey<T>());
-            return World.ComponentTable.ContainsKey(key);
+            var key = ComponentTypeKey.GetKey<T>();
+            return _components.ContainsKey(key);
         }
 
         public void RemoveComponent<T>()
             where T : Component
         {
-            var typeKey = ComponentTypeKey.GetKey<T>();
-            var key = new EntityComponentKey(this, typeKey);
+            var key = ComponentTypeKey.GetKey<T>();
             Component component;
 
-            if (World.ComponentTable.TryRemove(key, out component))
-                RaiseComponentRemoved(typeKey, component);
+            if (_components.TryRemove(key, out component))
+                RaiseComponentRemoved(key, component);
         }
 
         private void RaiseComponentRemoved(ComponentTypeKey key, Component component)
@@ -141,20 +138,11 @@ namespace Jacinth.Entities
         }
 
         /// <summary>
-        /// Removes all Components from this Entity
+        /// Removes all Components from this Entity an removes it from the World
         /// </summary>
-        public void Dispose()
+        public void Destroy()
         {
-            foreach(var key in World
-                .ComponentTable
-                .Keys
-                .Where(k => k.Entity._hashCode == this._hashCode
-                    && k.Entity.Equals(this))
-                .ToArray())
-            {
-                Component component;
-                World.ComponentTable.TryRemove(key, out component);
-            }
+
 
             RaiseComponentRemoved();
         }
