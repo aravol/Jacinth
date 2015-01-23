@@ -13,12 +13,12 @@ namespace Jacinth.Components
         /// <summary>
         /// Statically caches and accesses the Component Key associated with the type T
         /// </summary>
-        private static class StaticKeyCache<T>
+        private static class StaticKey<T>
             where T : Component
         {
             public static ComponentTypeKey Key { get; private set; }
 
-            static StaticKeyCache()
+            static StaticKey()
             {
                 Key = typeof(T)
                     .GetCustomAttribute<KeyingComponentAttribute>(true)
@@ -51,7 +51,7 @@ namespace Jacinth.Components
         public static ComponentTypeKey GetKey<T>()
             where T : Component
         {
-            return StaticKeyCache<T>.Key;
+            return StaticKey<T>.Key;
         }
 
         public override int GetHashCode()
