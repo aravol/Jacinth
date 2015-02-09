@@ -43,6 +43,7 @@
     <Compile Include="Processors\JacinthProcessorAttribute.cs" />
     <Compile Include="Processors\Processor.cs" />
     <Compile Include="Processors\ProcessorLoop.cs" />
+    <Compile Include="Processors\SingleProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
