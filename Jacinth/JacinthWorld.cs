@@ -61,7 +61,6 @@ namespace Jacinth
 
         /// <summary>
         /// <para>Gets all Entities currently active in this World.</para>
-        /// <para>WARNING: Expensive operation. Needs optimization.</para>
         /// </summary>
         public IEnumerable<Entity> Entities
         {
@@ -69,7 +68,8 @@ namespace Jacinth
         }
 
         /// <summary>
-        /// Gets all Components currently active in this World.
+        /// <para>Gets all Components currently active in this World.</para>
+        /// <para>WARNING: Expensive operation. May need optimization.</para>
         /// </summary>
         public IEnumerable<Component> Components
         {
