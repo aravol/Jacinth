@@ -14,6 +14,9 @@ namespace Jacinth.Entities
     /// </summary>
     public sealed class Entity : IEquatable<Entity>
     {
+        internal event EventHandler<ComponentAddedEventArgs> ComponentAdded;
+        internal event EventHandler<ComponentRemovedEventArgs> ComponentRemoved;
+
         private readonly JacinthWorld _world;
         private readonly int _hashCode;
         private readonly Guid _id;
@@ -21,21 +24,17 @@ namespace Jacinth.Entities
         private ConcurrentDictionary<ComponentTypeKey, Component> _components
             = new ConcurrentDictionary<ComponentTypeKey, Component>();
 
-        internal event EventHandler<ComponentAddedEventArgs> ComponentAdded;
-        internal event EventHandler<ComponentRemovedEventArgs> ComponentRemoved;
-
         /// <summary>
-        /// The World to which this Entity belongs
+        /// Gets the World to which this Entity belongs
         /// </summary>
         public JacinthWorld World { get { return _world; } }
 
         /// <summary>
         /// <para>Gets all Components attached to this Entity.</para>
-        /// <para>WANRING: This is an expensive operation, and unlikely to be optimized in the future. Avoid where possible.</para>
         /// </summary>
         public IEnumerable<Component> Components
         {
-            get {                 return _components.Values;            }
+            get { return _components.Values; }
         }
 
         /// <summary>
@@ -52,8 +51,11 @@ namespace Jacinth.Entities
             ComponentRemoved += (sender, args) => { };
         }
 
-        // TODO: Has, Get, Create, and Remove accessors for Components using Keys
-
+        /// <summary>
+        /// Adds a new Component of the speicfied type to this Entity using the default Costructor
+        /// </summary>
+        /// <typeparam name="T">The type of Component to add to this Entity, used to determine the ComponentTypeKey</typeparam>
+        /// <returns>The newly created Component</returns>
         public T AddComponent<T>()
             where T : Component, new()
         {
@@ -62,6 +64,11 @@ namespace Jacinth.Entities
             return result;
         }
 
+        /// <summary>
+        /// Adds a new Component to this Entity
+        /// </summary>
+        /// <typeparam name="T">The type of Component to add to this Entity, used to determine the ComponentTypeKey</typeparam>
+        /// <param name="component">The Component to be added</param>
         public void AddComponent<T>(T component)
             where T : Component
         {
@@ -73,6 +80,11 @@ namespace Jacinth.Entities
             }
         }
 
+        /// <summary>
+        /// Gets the Comoponent keyed to the specified type on this Entity, or null if not found
+        /// </summary>
+        /// <typeparam name="T">The type of Component to add to this Entity, used to determine the ComponentTypeKey</typeparam>
+        /// <returns>The Component if found, or null otherwise</returns>
         public T GetComponent<T>()
             where T : Component
         {
@@ -80,17 +92,42 @@ namespace Jacinth.Entities
             return TryGetComponent<T>(out result) ? null : result;
         }
 
-        public T GetOrCreateComponent<T>()
+        /// /// <summary>
+        /// Gets the specified type of Component from this Entity, or creates and adds it if not found.
+        /// </summary>
+        /// <typeparam name="T">The type of Component to add to this Entity, used to determine the ComponentTypeKey</typeparam>
+        /// <param name="created">True if the Component was created, False otherwise</param>
+        /// <returns>The found or created Component</returns>
+        public T GetOrCreateComponent<T>(out bool created)
             where T : Component, new()
         {
             var key = ComponentTypeKey.GetKey<T>();
             Component result;
-            if (_components.TryGetValue(key, out result))
+            created = !_components.TryGetValue(key, out result);
+            if (!created)
                 return (T) result; // Hard cast to propogate an InvalidCastException if used incorrectly
             else
                 return AddComponent<T>();
         }
+               
+        /// /// <summary>
+        /// Gets the specified type of Component from this Entity, or creates and adds it if not found.
+        /// </summary>
+        /// <typeparam name="T">The type of Component to add to this Entity, used to determine the ComponentTypeKey</typeparam>
+        /// <returns>The found or created Component</returns>
+        public T GetOrCreateComponent<T>()
+            where T : Component, new()
+        {
+            bool ignored;
+            return GetOrCreateComponent<T>(out ignored);
+        }
 
+        /// <summary>
+        /// Attempts to get the Component of the specified type on this Entity
+        /// </summary>
+        /// <typeparam name="T">The type of Component to add to this Entity, used to determine the ComponentTypeKey</typeparam>
+        /// <param name="component">The Component, if found</param>
+        /// <returns>True if the Component was found, False otherwise</returns>
         public bool TryGetComponent<T>(out T component)
             where T : Component
         {
@@ -105,6 +142,12 @@ namespace Jacinth.Entities
                 && component != null;
         }
 
+        /// <summary>
+        /// <para>Checks whether this Entity has a Component of the given Type.</para>
+        /// <para>Due to the highly parallel nature of Jacinth, this method should NOT be used before gettig a Component - use TryGetComponent instead</para>
+        /// </summary>
+        /// <typeparam name="T">The type of Component to add to this Entity, used to determine the ComponentTypeKey</typeparam>
+        /// <returns>True if the Component was found, False otherwise</returns>
         public bool HasComponent<T>()
             where T : Component
         {
@@ -112,6 +155,10 @@ namespace Jacinth.Entities
             return _components.ContainsKey(key);
         }
 
+        /// <summary>
+        /// Removes the Component of the specified type from this Entity
+        /// </summary>
+        /// <typeparam name="T">The type of Component to add to this Entity, used to determine the ComponentTypeKey</typeparam>
         public void RemoveComponent<T>()
             where T : Component
         {
@@ -142,16 +189,23 @@ namespace Jacinth.Entities
         /// </summary>
         public void Destroy()
         {
-
-
             RaiseComponentRemoved();
         }
 
+        /// <summary>
+        /// Gets the Hash Code of this Entity, which is determined when the Entity is instantiated
+        /// </summary>
+        /// <returns>The Hash Code of this Entity</returns>
         public override int GetHashCode()
         {
             return _hashCode;
         }
 
+        /// <summary>
+        /// Checks whether this Entity is the same as another Entity
+        /// </summary>
+        /// <param name="other">The other Entity to compare against</param>
+        /// <returns>True if these Entities are logcally the same, False otherwise</returns>
         public bool Equals(Entity other)
         {
             return this._id == other._id;

@@ -24,6 +24,7 @@ namespace Jacinth.Processors
             get { return _name; }
         }
 
+        /// <param name="name">The name of the Loop to subscribe this Processor to</param>
         public JacinthProcessorAttribute(string name = ProcessorLoop.UpdateLoopName)
         {
             _name = name;

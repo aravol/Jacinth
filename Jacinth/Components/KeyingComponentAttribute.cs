@@ -16,6 +16,9 @@ namespace Jacinth.Components
     public sealed class KeyingComponentAttribute
         : Attribute
     {
+        /// <summary>
+        /// The ComponentTypeKey associated with this Attribute
+        /// </summary>
         public ComponentTypeKey Key { get; private set; }
 
         /// <summary>

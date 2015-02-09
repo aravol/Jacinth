@@ -48,17 +48,28 @@ namespace Jacinth.Components
                 : TargetType.GetHashCode();     // The has code is a shortcut used in most of .NET - since we use referential equality, hash collisions are moot
         }
 
+        /// <summary>
+        /// Gets a ComponentTypeKey from a given type
+        /// </summary>
+        /// <typeparam name="T">The Type of Component to get a Key for</typeparam>
+        /// <returns>The ComponentTypeKey associated with the given type</returns>
         public static ComponentTypeKey GetKey<T>()
             where T : Component
         {
             return StaticKey<T>.Key;
         }
 
+        /// <summary>
+        /// Generates a Hash Code for this instance
+        /// </summary>
         public override int GetHashCode()
         {
             return _hash;
         }
 
+        /// <summary>
+        /// Determines equality between this instance and another
+        /// </summary>
         public bool Equals(ComponentTypeKey other)
         {
             // Becuase they are tied to a type via an Attribute, logical and referential equality should always be the same for ComponentKeys

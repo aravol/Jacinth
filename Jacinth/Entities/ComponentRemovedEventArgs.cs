@@ -9,7 +9,7 @@ using Jacinth.Components;
 namespace Jacinth.Entities
 {
     /// <summary>
-    /// Args encapsulating the event fired when a Component is removed from an Entity
+    /// Arguments for when a Component is removed from an Entity
     /// </summary>
     public class ComponentRemovedEventArgs : EventArgs
     {
@@ -18,12 +18,27 @@ namespace Jacinth.Entities
         private readonly Component _component;
         private readonly bool _eraseAll;
 
+        /// <summary>
+        /// Gets the Entity from which a Component has been Removed
+        /// </summary>
         public Entity Entity { get { return _entity; } }
+
+        /// <summary>
+        /// Gets whether all Components are being removed from the target Entity
+        /// </summary>
         public bool EraseAll { get { return _eraseAll; } }
+
+        /// <summary>
+        /// Gets the ComponentTypeKey of the removed Component, or null if removing all Components
+        /// </summary>
         public ComponentTypeKey ComponentTypeKey { get { return _componentTypeKey; } }
+
+        /// <summary>
+        /// Gets the Component being removed, or null if removing all Components
+        /// </summary>
         public Component Component { get { return _component; } }
 
-        public ComponentRemovedEventArgs(Entity entity, ComponentTypeKey key = null, Component component = null)
+        internal ComponentRemovedEventArgs(Entity entity, ComponentTypeKey key = null, Component component = null)
         {
             _entity = entity;
             if (component == null || key == null)

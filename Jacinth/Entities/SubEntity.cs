@@ -30,45 +30,60 @@ namespace Jacinth.Entities
             _entity.ComponentRemoved += OnEntityComponentRemoved;
         }
 
-        protected void RaiseOutdated(SubEntityOutdatedEventArgs args)
+        /// <summary>
+        /// Raises an event to indicate that this SubEntity is no longer valid and should be removed from all Processors utilizing it
+        /// </summary>
+        protected void RaiseOutdated()
         {
             Entity.ComponentAdded -= OnEntityComponentAdded;
             Entity.ComponentRemoved -= OnEntityComponentRemoved;
 
-            if (Outdated != null) Outdated(this, args);
+            if (Outdated != null) Outdated(this, new SubEntityOutdatedEventArgs(Entity));
         }
 
         /// <summary>
-        /// Handler called when a new Component is added to the Entity. Defaults as a no-op.
+        /// Handler called when a new Component is added to the Entity.
         /// </summary>
         protected virtual void OnEntityComponentAdded(object sender, EventArgs e) { }
 
         /// <summary>
-        /// Handler called when a Component is removed from the Entity. Defaults to a no-op.
+        /// Handler called when a Component is removed from the Entity.
         /// </summary>
         protected virtual void OnEntityComponentRemoved(object sender, ComponentRemovedEventArgs e) { }
     }
 
     #region Standard Sub entities
 
+    /// <summary>
+    /// Standard SubEntity which monitors a single Component
+    /// </summary>
+    /// <typeparam name="T1">The type of Component this SubEntity monitors</typeparam>
     public class SubEntity<T1> : SubEntity
         where T1 : Component
     {
         private readonly T1 _component1;
 
+        /// <summary>
+        /// Gets the Component monitored by this SubEntity
+        /// </summary>
         public T1 Component1 { get { return _component1; } }
 
+        // Registers the appropriate Factory for this SubEntity type
         static SubEntity()
         {
             SubEntityFactory.RegisterSubEntityFactory<SubEntity<T1>>(GenerateSubEntity);
         }
 
-        public SubEntity(Entity entity, T1 component1)
+        /// <summary>
+        /// Creates a new SubEntity against the given Entity with the given Component
+        /// </summary>
+        protected SubEntity(Entity entity, T1 component1)
             : base(entity)
         {
             _component1 = component1;
         }
 
+        // Generation method for this type of SubEntity
         private static bool GenerateSubEntity(Entity entity, out SubEntity<T1> subEntity)
         {
             T1 component1;
@@ -86,16 +101,24 @@ namespace Jacinth.Entities
             }
         }
 
+        /// <summary>
+        /// Handler called when a Component is removed from the Entity.
+        /// </summary>
         protected override void OnEntityComponentRemoved(object sender, ComponentRemovedEventArgs e)
         {
             if(e.EraseAll)
-                RaiseOutdated(new SubEntityOutdatedEventArgs(Entity));
+                RaiseOutdated();
 
             if (e.ComponentTypeKey == ComponentTypeKey.GetKey<T1>())
-                RaiseOutdated(new SubEntityOutdatedEventArgs(Entity));
+                RaiseOutdated();
         }
     }
-
+    
+    /// <summary>
+    /// Standard SubEntity which monitors a pair of Components
+    /// </summary>
+    /// <typeparam name="T1">The first type of Component this SubEntity monitors</typeparam>
+    /// <typeparam name="T2">The second type of Component this SubEntity monitors</typeparam>
     public class SubEntity<T1, T2> : SubEntity
         where T1 : Component
         where T2 : Component
@@ -103,7 +126,14 @@ namespace Jacinth.Entities
         private readonly T1 _component1;
         private readonly T2 _component2;
 
+        /// <summary>
+        /// Gets the first Component monitored by this SubEntity
+        /// </summary>
         public T1 Component1 { get { return _component1; } }
+        
+        /// <summary>
+        /// Gets the second Component monitored by this SubEntity
+        /// </summary>
         public T2 Component2 { get { return _component2; } }
 
         static SubEntity()
@@ -111,6 +141,9 @@ namespace Jacinth.Entities
             SubEntityFactory.RegisterSubEntityFactory <SubEntity<T1, T2>>(GenerateSubEntity);
         }
 
+        /// <summary>
+        /// Creates a new SubEntity against the given Entity with the given Components
+        /// </summary>
         protected SubEntity(Entity entity, T1 component1, T2 component2)
             : base(entity)
         {
@@ -135,17 +168,26 @@ namespace Jacinth.Entities
             }
         }
 
+        /// <summary>
+        /// Handler called when a Component is removed from the Entity.
+        /// </summary>
         protected override void OnEntityComponentRemoved(object sender, ComponentRemovedEventArgs e)
         {
             if (e.EraseAll)
-                RaiseOutdated(new SubEntityOutdatedEventArgs(Entity));
+                RaiseOutdated();
 
             if (e.ComponentTypeKey == ComponentTypeKey.GetKey<T1>()
                 || e.ComponentTypeKey == ComponentTypeKey.GetKey<T2>())
-                RaiseOutdated(new SubEntityOutdatedEventArgs(Entity));
+                RaiseOutdated();
         }
     }
-
+    
+    /// <summary>
+    /// Standard SubEntity which monitors three Components
+    /// </summary>
+    /// <typeparam name="T1">The first type of Component this SubEntity monitors</typeparam>
+    /// <typeparam name="T2">The second type of Component this SubEntity monitors</typeparam>
+    /// <typeparam name="T3">The third type of Component this SubEntity monitors</typeparam>
     public class SubEntity<T1, T2, T3> : SubEntity
         where T1 : Component
         where T2 : Component
@@ -154,9 +196,20 @@ namespace Jacinth.Entities
         private readonly T1 _component1;
         private readonly T2 _component2;
         private readonly T3 _component3;
-
+        
+        /// <summary>
+        /// Gets the first Component monitored by this SubEntity
+        /// </summary>
         public T1 Component1 { get { return _component1; } }
+        
+        /// <summary>
+        /// Gets the second Component monitored by this SubEntity
+        /// </summary>
         public T2 Component2 { get { return _component2; } }
+        
+        /// <summary>
+        /// Gets the fourth Component monitored by this SubEntity
+        /// </summary>
         public T3 Component3 { get { return _component3; } }
 
         static SubEntity()
@@ -164,6 +217,9 @@ namespace Jacinth.Entities
             SubEntityFactory.RegisterSubEntityFactory<SubEntity<T1, T2, T3>>(GenerateSubEntity);
         }
 
+        /// <summary>
+        /// Creates a new SubEntity against the given Entity with the given Components
+        /// </summary>
         protected SubEntity(Entity entity, T1 component1, T2 component2, T3 component3)
             : base(entity)
         {
@@ -190,19 +246,28 @@ namespace Jacinth.Entities
                 return false;
             }
         }
-
+        
+        /// <summary>
+        /// Handler called when a Component is removed from the Entity.
+        /// </summary>
         protected override void OnEntityComponentRemoved(object sender, ComponentRemovedEventArgs e)
         {
             if (e.EraseAll)
-                RaiseOutdated(new SubEntityOutdatedEventArgs(Entity));
-
+                RaiseOutdated();
             if (e.ComponentTypeKey == ComponentTypeKey.GetKey<T1>()
                 || e.ComponentTypeKey == ComponentTypeKey.GetKey<T2>()
                 || e.ComponentTypeKey == ComponentTypeKey.GetKey<T3>())
-                RaiseOutdated(new SubEntityOutdatedEventArgs(Entity));
+                RaiseOutdated();
         }
     }
 
+    /// <summary>
+    /// Standard SubEntity which monitors four Components
+    /// </summary>
+    /// <typeparam name="T1">The first type of Component this SubEntity monitors</typeparam>
+    /// <typeparam name="T2">The second type of Component this SubEntity monitors</typeparam>
+    /// <typeparam name="T3">The third type of Component this SubEntity monitors</typeparam>
+    /// <typeparam name="T4">The fourth type of Component this SubEntity monitors</typeparam>
     public class SubEntity<T1, T2, T3, T4> : SubEntity
         where T1 : Component
         where T2 : Component
@@ -213,10 +278,25 @@ namespace Jacinth.Entities
         private readonly T2 _component2;
         private readonly T3 _component3;
         private readonly T4 _component4;
-
+        
+        /// <summary>
+        /// Gets the first Component monitored by this SubEntity
+        /// </summary>
         public T1 Component1 { get { return _component1; } }
-        public T2 Component2 { get { return _component2; } } 
+
+        /// <summary>
+        /// Gets the second Component monitored by this SubEntity
+        /// </summary>
+        public T2 Component2 { get { return _component2; } }
+
+        /// <summary>
+        /// Gets the third Component monitored by this SubEntity
+        /// </summary>
         public T3 Component3 { get { return _component3; } }
+
+        /// <summary>
+        /// Gets the fourth Component monitored by this SubEntity
+        /// </summary>
         public T4 Component4 { get { return _component4; } }
 
         static SubEntity()
@@ -224,6 +304,9 @@ namespace Jacinth.Entities
             SubEntityFactory.RegisterSubEntityFactory<SubEntity<T1, T2, T3, T4>>(GenerateSubEntity);
         }
 
+        /// <summary>
+        /// Creates a new SubEntity against the given Entity with the given Components
+        /// </summary>
         protected SubEntity(Entity entity, T1 component1, T2 component2, T3 component3, T4 component4)
             : base(entity)
         {
@@ -253,20 +336,29 @@ namespace Jacinth.Entities
                 return false;
             }
         }
-
+        
+        /// <summary>
+        /// Handler called when a Component is removed from the Entity.
+        /// </summary>
         protected override void OnEntityComponentRemoved(object sender, ComponentRemovedEventArgs e)
         {
-            if (e.EraseAll)
-                RaiseOutdated(new SubEntityOutdatedEventArgs(Entity));
-
-            if (e.ComponentTypeKey == ComponentTypeKey.GetKey<T1>()
+            if (e.EraseAll
+                || e.ComponentTypeKey == ComponentTypeKey.GetKey<T1>()
                 || e.ComponentTypeKey == ComponentTypeKey.GetKey<T2>()
                 || e.ComponentTypeKey == ComponentTypeKey.GetKey<T3>()
                 || e.ComponentTypeKey == ComponentTypeKey.GetKey<T4>())
-                RaiseOutdated(new SubEntityOutdatedEventArgs(Entity));
+            { RaiseOutdated(); }
         }
     }
-
+    
+    /// <summary>
+    /// Standard SubEntity which monitors five Components
+    /// </summary>
+    /// <typeparam name="T1">The first type of Component this SubEntity monitors</typeparam>
+    /// <typeparam name="T2">The second type of Component this SubEntity monitors</typeparam>
+    /// <typeparam name="T3">The third type of Component this SubEntity monitors</typeparam>
+    /// <typeparam name="T4">The fourth type of Component this SubEntity monitors</typeparam>
+    /// <typeparam name="T5">The fifth type of Component this SubEntity monitors</typeparam>
     public class SubEntity<T1, T2, T3, T4, T5> : SubEntity
         where T1 : Component
         where T2 : Component
@@ -280,10 +372,29 @@ namespace Jacinth.Entities
         private readonly T4 _component4;
         private readonly T5 _component5;
 
+        /// <summary>
+        /// Gets the first Component monitored by this SubEntity
+        /// </summary>
         public T1 Component1 { get { return _component1; } }
+
+        /// <summary>
+        /// Gets the second Component monitored by this SubEntity
+        /// </summary>
         public T2 Component2 { get { return _component2; } }
+
+        /// <summary>
+        /// Gets the third Component monitored by this SubEntity
+        /// </summary>
         public T3 Component3 { get { return _component3; } }
+
+        /// <summary>
+        /// Gets the fourth Component monitored by this SubEntity
+        /// </summary>
         public T4 Component4 { get { return _component4; } }
+        
+        /// <summary>
+        /// Gets the fifth Component monitored by this SubEntity
+        /// </summary>
         public T5 Component5 { get { return _component5; } }
 
         static SubEntity()
@@ -291,6 +402,9 @@ namespace Jacinth.Entities
             SubEntityFactory.RegisterSubEntityFactory<SubEntity<T1, T2, T3, T4, T5>>(GenerateSubEntity);
         }
 
+        /// <summary>
+        /// Creates a new SubEntity against the given Entity with the given Components
+        /// </summary>
         protected SubEntity(Entity entity, T1 component1, T2 component2, T3 component3, T4 component4, T5 component5)
             : base(entity)
         {
@@ -324,18 +438,21 @@ namespace Jacinth.Entities
                 return false;
             }
         }
-
+        
+        /// <summary>
+        /// Handler called when a Component is removed from the Entity.
+        /// </summary>
         protected override void OnEntityComponentRemoved(object sender, ComponentRemovedEventArgs e)
         {
             if (e.EraseAll)
-                RaiseOutdated(new SubEntityOutdatedEventArgs(Entity));
+                RaiseOutdated();
 
             if (e.ComponentTypeKey == ComponentTypeKey.GetKey<T1>()
                 || e.ComponentTypeKey == ComponentTypeKey.GetKey<T2>()
                 || e.ComponentTypeKey == ComponentTypeKey.GetKey<T3>()
                 || e.ComponentTypeKey == ComponentTypeKey.GetKey<T4>()
                 || e.ComponentTypeKey == ComponentTypeKey.GetKey<T5>())
-                RaiseOutdated(new SubEntityOutdatedEventArgs(Entity));
+                RaiseOutdated();
         }
     }
     #endregion

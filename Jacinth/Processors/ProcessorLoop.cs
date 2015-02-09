@@ -13,6 +13,10 @@ namespace Jacinth.Processors
     /// </summary>
     public sealed class ProcessorLoop
     {
+        /// <summary>
+        /// Name of the Update Loop,
+        /// used as a default when Loop is not specified for a Processor
+        /// </summary>
         public const string UpdateLoopName = "Update";
 
         private readonly string _name;
@@ -32,8 +36,14 @@ namespace Jacinth.Processors
         /// </summary>
         public string Name { get { return _name; } }
 
+        /// <summary>
+        /// Gets or sets whether to execute each Processor in this Loop one-at-a-time or in parallel
+        /// </summary>
         public bool SynchronousExecution { get; set; }
 
+        /// <summary>
+        /// Gets all Processors currently subscribed to this ProcessorLoop
+        /// </summary>
         public IEnumerable<Processor> Processors { get { return _processors; } } 
 
         internal ProcessorLoop(string name, JacinthWorld world)
@@ -77,7 +87,7 @@ namespace Jacinth.Processors
             }
         }
 
-        public void AddProcessor(Processor proc)
+        internal void AddProcessor(Processor proc)
         {
             if (World.Initialized) throw new InvalidOperationException();
 

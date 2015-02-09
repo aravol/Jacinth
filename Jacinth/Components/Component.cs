@@ -12,6 +12,9 @@ namespace Jacinth.Components
     /// </summary>
     public abstract class Component
     {
+        /// <summary>
+        /// The Entity this Component is attached to
+        /// </summary>
         public Entity Entity { get; internal set; }
     }
 }

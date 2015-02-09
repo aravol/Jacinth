@@ -75,12 +75,18 @@ namespace Jacinth
         {
             get { return Entities.SelectMany(e => e.Components); }
         }
-
+        
+        /// <summary>
+        /// Gets all Processor Loops active in this World in a Dictionary keyed by Name
+        /// </summary>
         public IReadOnlyDictionary<string, ProcessorLoop> ProcessorLoops
         {
             get { return _processorLoops; }
         }
 
+        /// <summary>
+        /// Gets all Processors active in this World
+        /// </summary>
         public IEnumerable<Processor> Processors
         {
             get { return _processors; }
@@ -89,7 +95,11 @@ namespace Jacinth
 
         #region Constructors
 
-        public JacinthWorld(bool initialize = false)
+        /// <summary>
+        /// Creates a new Jacinth World
+        /// </summary>
+        /// <param name="initialize">True to Initialize the World immediately, False otherwise</param>
+        public JacinthWorld(bool initialize = true)
         {
             if (initialize) Initialize();
         }
@@ -123,6 +133,9 @@ namespace Jacinth
             foreach (var p in Processors.AsParallel()) p.QueueEntityAdd(args.Entity);
         }
 
+        /// <summary>
+        /// Initializes the world and begins processing Entities
+        /// </summary>
         public void Initialize()
         {
             foreach (var procType in AppDomain.CurrentDomain.GetAssemblies()
