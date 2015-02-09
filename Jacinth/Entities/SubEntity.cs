@@ -15,7 +15,7 @@ namespace Jacinth.Entities
     {
         private readonly Entity _entity;
 
-        internal event EventHandler<SubEntityOutdatedEventArgs> Outdated;
+        internal event Action<SubEntity> Outdated;
 
         /// <summary>
         /// The Entity for whyich this SubEntity represents a specific subset of Components
@@ -28,6 +28,7 @@ namespace Jacinth.Entities
 
             _entity.ComponentAdded += OnEntityComponentAdded;
             _entity.ComponentRemoved += OnEntityComponentRemoved;
+            _entity.EntityDestroyed += OnEntityDestroyed;
         }
 
         /// <summary>
@@ -35,21 +36,29 @@ namespace Jacinth.Entities
         /// </summary>
         protected void RaiseOutdated()
         {
-            Entity.ComponentAdded -= OnEntityComponentAdded;
-            Entity.ComponentRemoved -= OnEntityComponentRemoved;
+            if (Outdated != null) Outdated(this);
 
-            if (Outdated != null) Outdated(this, new SubEntityOutdatedEventArgs(Entity));
+            // Detach event listeners
+            Outdated = null;
         }
 
         /// <summary>
         /// Handler called when a new Component is added to the Entity.
         /// </summary>
-        protected virtual void OnEntityComponentAdded(object sender, EventArgs e) { }
+        protected virtual void OnEntityComponentAdded(Entity entity, ComponentTypeKey key, Component component) { }
 
         /// <summary>
         /// Handler called when a Component is removed from the Entity.
         /// </summary>
-        protected virtual void OnEntityComponentRemoved(object sender, ComponentRemovedEventArgs e) { }
+        protected virtual void OnEntityComponentRemoved(Entity entity, ComponentTypeKey key, Component component) { }
+
+        /// <summary>
+        /// Handler called when the underlying Entity is Destroyed
+        /// </summary>
+        protected virtual void OnEntityDestroyed(Entity entity)
+        {
+            RaiseOutdated();
+        }
     }
 
     #region Standard Sub entities
@@ -104,13 +113,10 @@ namespace Jacinth.Entities
         /// <summary>
         /// Handler called when a Component is removed from the Entity.
         /// </summary>
-        protected override void OnEntityComponentRemoved(object sender, ComponentRemovedEventArgs e)
+        protected override void OnEntityComponentRemoved(Entity entity, ComponentTypeKey key, Component component)
         {
-            if(e.EraseAll)
-                RaiseOutdated();
-
-            if (e.ComponentTypeKey == ComponentTypeKey.GetKey<T1>())
-                RaiseOutdated();
+            if (key == ComponentTypeKey.GetKey<T1>())
+            { RaiseOutdated(); }
         }
     }
     
@@ -171,14 +177,11 @@ namespace Jacinth.Entities
         /// <summary>
         /// Handler called when a Component is removed from the Entity.
         /// </summary>
-        protected override void OnEntityComponentRemoved(object sender, ComponentRemovedEventArgs e)
+        protected override void OnEntityComponentRemoved(Entity entity, ComponentTypeKey key, Component component)
         {
-            if (e.EraseAll)
-                RaiseOutdated();
-
-            if (e.ComponentTypeKey == ComponentTypeKey.GetKey<T1>()
-                || e.ComponentTypeKey == ComponentTypeKey.GetKey<T2>())
-                RaiseOutdated();
+            if (key == ComponentTypeKey.GetKey<T1>()
+                || key == ComponentTypeKey.GetKey<T2>())
+            { RaiseOutdated(); }
         }
     }
     
@@ -250,14 +253,12 @@ namespace Jacinth.Entities
         /// <summary>
         /// Handler called when a Component is removed from the Entity.
         /// </summary>
-        protected override void OnEntityComponentRemoved(object sender, ComponentRemovedEventArgs e)
+        protected override void OnEntityComponentRemoved(Entity entity, ComponentTypeKey key, Component component)
         {
-            if (e.EraseAll)
-                RaiseOutdated();
-            if (e.ComponentTypeKey == ComponentTypeKey.GetKey<T1>()
-                || e.ComponentTypeKey == ComponentTypeKey.GetKey<T2>()
-                || e.ComponentTypeKey == ComponentTypeKey.GetKey<T3>())
-                RaiseOutdated();
+            if (key == ComponentTypeKey.GetKey<T1>()
+                || key == ComponentTypeKey.GetKey<T2>()
+                || key == ComponentTypeKey.GetKey<T3>())
+            { RaiseOutdated(); }
         }
     }
 
@@ -340,13 +341,12 @@ namespace Jacinth.Entities
         /// <summary>
         /// Handler called when a Component is removed from the Entity.
         /// </summary>
-        protected override void OnEntityComponentRemoved(object sender, ComponentRemovedEventArgs e)
+        protected override void OnEntityComponentRemoved(Entity entity, ComponentTypeKey key, Component component)
         {
-            if (e.EraseAll
-                || e.ComponentTypeKey == ComponentTypeKey.GetKey<T1>()
-                || e.ComponentTypeKey == ComponentTypeKey.GetKey<T2>()
-                || e.ComponentTypeKey == ComponentTypeKey.GetKey<T3>()
-                || e.ComponentTypeKey == ComponentTypeKey.GetKey<T4>())
+            if (key == ComponentTypeKey.GetKey<T1>()
+                || key == ComponentTypeKey.GetKey<T2>()
+                || key == ComponentTypeKey.GetKey<T3>()
+                || key == ComponentTypeKey.GetKey<T4>())
             { RaiseOutdated(); }
         }
     }
@@ -442,17 +442,14 @@ namespace Jacinth.Entities
         /// <summary>
         /// Handler called when a Component is removed from the Entity.
         /// </summary>
-        protected override void OnEntityComponentRemoved(object sender, ComponentRemovedEventArgs e)
+        protected override void OnEntityComponentRemoved(Entity entity, ComponentTypeKey key, Component component)
         {
-            if (e.EraseAll)
-                RaiseOutdated();
-
-            if (e.ComponentTypeKey == ComponentTypeKey.GetKey<T1>()
-                || e.ComponentTypeKey == ComponentTypeKey.GetKey<T2>()
-                || e.ComponentTypeKey == ComponentTypeKey.GetKey<T3>()
-                || e.ComponentTypeKey == ComponentTypeKey.GetKey<T4>()
-                || e.ComponentTypeKey == ComponentTypeKey.GetKey<T5>())
-                RaiseOutdated();
+            if (key == ComponentTypeKey.GetKey<T1>()
+                || key == ComponentTypeKey.GetKey<T2>()
+                || key == ComponentTypeKey.GetKey<T3>()
+                || key == ComponentTypeKey.GetKey<T4>()
+                || key == ComponentTypeKey.GetKey<T5>())
+            { RaiseOutdated(); }
         }
     }
     #endregion

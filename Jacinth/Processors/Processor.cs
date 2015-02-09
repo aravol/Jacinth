@@ -35,7 +35,7 @@ namespace Jacinth.Processors
         protected Processor(JacinthWorld world) { _world = world; }
 
         /// <summary>
-        /// Precoesses the entities in this Processor
+        /// Processes the entities in this Processor
         /// </summary>
         /// <param name="deltaTime">The time since the last execution on this Loop</param>
         protected internal abstract void Process(TimeSpan deltaTime);
@@ -130,12 +130,9 @@ namespace Jacinth.Processors
             }
         }
 
-        private void OnSubEntityOutdated(object sender, SubEntityOutdatedEventArgs args)
+        private void OnSubEntityOutdated(SubEntity subEntity)
         {
-            QueueEntityRemove(args.Entity);
-
-            // Detach this listener
-            ((SubEntity)(sender)).Outdated -= OnSubEntityOutdated;
+            QueueEntityRemove(subEntity.Entity);
         }
 
         internal sealed override void QueueEntityAdd(Entity entity)

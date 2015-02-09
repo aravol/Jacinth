@@ -14,8 +14,9 @@ namespace Jacinth.Entities
     /// </summary>
     public sealed class Entity : IEquatable<Entity>
     {
-        internal event EventHandler<ComponentAddedEventArgs> ComponentAdded;
-        internal event EventHandler<ComponentRemovedEventArgs> ComponentRemoved;
+        internal event Action<Entity, ComponentTypeKey, Component> ComponentAdded;
+        internal event Action<Entity, ComponentTypeKey, Component> ComponentRemoved;
+        internal event Action<Entity> EntityDestroyed;
 
         private readonly JacinthWorld _world;
         private readonly int _hashCode;
@@ -45,10 +46,6 @@ namespace Jacinth.Entities
             _world = world;
             _id = Guid.NewGuid();
             _hashCode = _id.GetHashCode();
-
-            // Attach no-op event handlers to prevent event raise errors
-            ComponentAdded += (sender, args) => { };
-            ComponentRemoved += (sender, args) => { };
         }
 
         /// <summary>
@@ -73,10 +70,11 @@ namespace Jacinth.Entities
             where T : Component
         {
             component.Entity = this;
+            var key = ComponentTypeKey.GetKey<T>();
 
-            if (_components.TryAdd(ComponentTypeKey.GetKey<T>(), component))
+            if (_components.TryAdd(key, component))
             {
-                RaiseComponentAdded(component);
+                RaiseComponentAdded(key, component);
             }
         }
 
@@ -156,7 +154,8 @@ namespace Jacinth.Entities
         }
 
         /// <summary>
-        /// Removes the Component of the specified type from this Entity
+        /// Removes the Component of the specified type from this Entity.
+        /// Destroys this Entity if there are no Components left on this Entity.
         /// </summary>
         /// <typeparam name="T">The type of Component to add to this Entity, used to determine the ComponentTypeKey</typeparam>
         public void RemoveComponent<T>()
@@ -166,22 +165,29 @@ namespace Jacinth.Entities
             Component component;
 
             if (_components.TryRemove(key, out component))
-                RaiseComponentRemoved(key, component);
+            {
+                if (_components.Any())
+                    RaiseComponentRemoved(key, component);
+                else
+                    Destroy();
+            }
         }
 
         private void RaiseComponentRemoved(ComponentTypeKey key, Component component)
         {
-            Task.Run(() => ComponentRemoved.Invoke(this, new ComponentRemovedEventArgs(this, key, component)));
+            Task.Run(() =>
+            {
+                if(ComponentRemoved != null)
+                    ComponentRemoved(this, key, component);
+            });
         }
-
-        private void RaiseComponentRemoved()
+        private void RaiseComponentAdded(ComponentTypeKey key, Component component)
         {
-            Task.Run(() => ComponentRemoved.Invoke(this, new ComponentRemovedEventArgs(this)));
-        }
-
-        private void RaiseComponentAdded(Component component)
-        {
-            Task.Run(() => ComponentAdded.Invoke(this, new ComponentAddedEventArgs(this, component)));
+            Task.Run(() =>
+            {
+                if(ComponentAdded != null)
+                    ComponentAdded(this, key, component);
+            });
         }
 
         /// <summary>
@@ -189,7 +195,15 @@ namespace Jacinth.Entities
         /// </summary>
         public void Destroy()
         {
-            RaiseComponentRemoved();
+            Task.Run(() =>
+            {
+                if (EntityDestroyed != null) EntityDestroyed(this);
+            });
+
+            // Detach all event listeners
+            EntityDestroyed = null;
+            ComponentAdded = null;
+            ComponentRemoved = null;
         }
 
         /// <summary>

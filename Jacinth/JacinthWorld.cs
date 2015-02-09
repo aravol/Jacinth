@@ -128,9 +128,9 @@ namespace Jacinth
                 _entities.Remove(entity);
         }
 
-        private void OnComponentAdded(object sender, ComponentAddedEventArgs args)
+        private void OnComponentAdded(Entity entity, ComponentTypeKey key, Component component)
         {
-            foreach (var p in Processors.AsParallel()) p.QueueEntityAdd(args.Entity);
+            foreach (var p in Processors.AsParallel()) p.QueueEntityAdd(entity);
         }
 
         /// <summary>
