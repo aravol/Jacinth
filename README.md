@@ -1,5 +1,6 @@
 # Jacinth
-### Jacinth Entity System, by Aravol
+---
+Jacinth Entity System, by Aravol
 - [Official GitHub Page](https://github.com/aravol/Jacinth/)
 - [Official NuGet Package](http://www.nuget.org/packages/Jacinth/)
 
