@@ -10,8 +10,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompany("Aravol")]
 [assembly: AssemblyProduct("Jacinth")]
 [assembly: AssemblyCopyright("Eclipse Public License - v 1.0")]
-[assembly: AssemblyVersion("1.0.1.0")]
-[assembly: AssemblyFileVersion("1.0.1.0")]
+[assembly: AssemblyVersion("1.1.0.0")]
+[assembly: AssemblyFileVersion("1.1.0.0")]
 
 [assembly: Guid("3d574737-a912-44d8-8e9b-da9b2a61f981")]
 

@@ -20,6 +20,14 @@ namespace Jacinth
     /// </summary>
     public sealed class JacinthWorld
     {
+        #region Events
+
+        /// <summary>
+        /// Raised when an Entity is updated with new Components and requires possible addition to active Processors
+        /// </summary>
+        internal event Action<Entity> EntityUpdated;
+        #endregion
+
         #region Values
 
         private readonly object _entityLock = new object();
@@ -130,7 +138,7 @@ namespace Jacinth
 
         private void OnComponentAdded(Entity entity, ComponentTypeKey key, Component component)
         {
-            foreach (var p in Processors.AsParallel()) p.QueueEntityAdd(entity);
+            EntityUpdated(entity);
         }
 
         /// <summary>
@@ -156,8 +164,7 @@ namespace Jacinth
 
             // Perform first-time mass add of all entities to all processors
             foreach (var ent in Entities)
-                foreach (var proc in Processors)
-                    proc.QueueEntityAdd(ent);
+                EntityUpdated(ent);
 
             // Set the initialized flag to prevent modification to Loops and Processors
             Initialized = true;

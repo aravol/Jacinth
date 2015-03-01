@@ -38,9 +38,11 @@
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Entities\SubEntity.cs" />
     <Compile Include="Entities\SubEntityFactory.cs" />
+    <Compile Include="Entities\SubEntitySet.cs" />
     <Compile Include="JacinthWorld.cs" />
     <Compile Include="Processors\AggregateProcessor.cs" />
     <Compile Include="Processors\JacinthProcessorAttribute.cs" />
+    <Compile Include="Processors\MultiSetProcessor.cs" />
     <Compile Include="Processors\Processor.cs" />
     <Compile Include="Processors\ProcessorLoop.cs" />
     <Compile Include="Processors\SingleProcessor.cs" />
