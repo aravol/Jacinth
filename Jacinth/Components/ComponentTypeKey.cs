@@ -20,9 +20,13 @@ namespace Jacinth.Components
 
             static StaticKey()
             {
-                Key = typeof(T)
-                    .GetCustomAttribute<KeyingComponentAttribute>(true)
-                    .Key;
+                var targetType = typeof(T);
+
+                // Walk the inheritance tree as far as requested by Inherit Component Key flags
+                while (targetType.GetCustomAttribute<InheritComponentKeyAttribute>(false) != null)
+                    targetType = targetType.BaseType;
+
+                Key = new ComponentTypeKey(targetType);
             }
         }
 
@@ -31,16 +35,12 @@ namespace Jacinth.Components
 
         /// <summary>
         /// Type that this ComponentKey is bound against, used for debugging purposes.
-        /// This value is NOT enforced by Jacinth and may not accurately reflect the type actually decorated with the corresponding KeyingComponentAttribute
         /// </summary>
         public Type TargetType { get; private set; }
 
         internal ComponentTypeKey(Type targetType)
         {
             TargetType = targetType;
-
-            // Do NOT check for the KeyingComponentAttribute being the correct instance here -
-            // Doing so will reinstantiate the KeyingComponentAttribute on the given type and result in a StackOverflowException
 
             // Account for the target type being null
             _hash = targetType == null
@@ -57,6 +57,21 @@ namespace Jacinth.Components
             where T : Component
         {
             return StaticKey<T>.Key;
+        }
+
+        /// <summary>
+        /// Gets a ComponentTypeKey for a given type
+        /// </summary>
+        /// <param name="targetType">The Type of Component to get a Key for</param>
+        /// <returns>The ComponentTypeKey associated with the given type</returns>
+        public static ComponentTypeKey GetKey(Type targetType)
+        {
+            // Look up the given key via Reflection
+            return typeof(StaticKey<>)
+                .MakeGenericType(targetType)
+                .GetProperty("Key")
+                .GetValue(null)
+                as ComponentTypeKey;
         }
 
         /// <summary>

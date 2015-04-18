@@ -34,7 +34,7 @@
   <ItemGroup>
     <Compile Include="Components\Component.cs" />
     <Compile Include="Components\ComponentTypeKey.cs" />
-    <Compile Include="Components\KeyingComponentAttribute.cs" />
+    <Compile Include="Components\InheritComponentKeyAttribute.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Entities\SubEntity.cs" />
     <Compile Include="Entities\SubEntityFactory.cs" />
