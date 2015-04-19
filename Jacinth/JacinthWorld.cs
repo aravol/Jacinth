@@ -1,17 +1,10 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
 using Jacinth.Components;
 using Jacinth.Entities;
 using Jacinth.Processors;
-
 
 namespace Jacinth
 {
@@ -116,18 +109,27 @@ namespace Jacinth
         #region Methods
 
         /// <summary>
-        /// Creates an Entity in this World
+        /// Creates an Entity in this World, but does not enable it.
         /// </summary>
-        /// <returns>The newly created Entity</returns>
+        /// <returns>
+        /// The newly created Entity. Must call <see cref="Jacinth.Entities.Entity.Enable"/> to use the Entity within the World
+        /// </returns>
         public Entity CreateEntity()
         {
             var result = new Entity(this);
-
-            lock (_entityLock)
-                _entities.Add(result);
-
-            result.ComponentAdded += OnComponentAdded;
+            result.Enabled += EntityOnEnabled;
             return result;
+        }
+
+        private void EntityOnEnabled(Entity entity)
+        {
+            lock (_entityLock)
+                _entities.Add(entity);
+
+            entity.ComponentAdded += OnComponentAdded;
+
+            // Immediately call entity update events for the new Entity
+            RaiseEntityUpdated(entity);
         }
 
         internal void RemoveEntity(Entity entity)
@@ -138,7 +140,7 @@ namespace Jacinth
 
         private void OnComponentAdded(Entity entity, ComponentTypeKey key, Component component)
         {
-            EntityUpdated(entity);
+            RaiseEntityUpdated(entity);
         }
 
         /// <summary>
@@ -164,7 +166,7 @@ namespace Jacinth
 
             // Perform first-time mass add of all entities to all processors
             foreach (var ent in Entities)
-                EntityUpdated(ent);
+                RaiseEntityUpdated(ent);
 
             // Set the initialized flag to prevent modification to Loops and Processors
             Initialized = true;
@@ -180,6 +182,12 @@ namespace Jacinth
                 ProcessorLoopsInternal.Add(name, result = new ProcessorLoop(name, this));
 
             return result;
+        }
+
+        private void RaiseEntityUpdated(Entity target)
+        {
+            if (EntityUpdated != null)
+                EntityUpdated(target);
         }
         #endregion
     }

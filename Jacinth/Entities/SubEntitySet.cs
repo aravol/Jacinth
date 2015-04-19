@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Jacinth.Entities
 {
@@ -55,7 +52,7 @@ namespace Jacinth.Entities
                     .Except(_entitiesToRemove)) // If the Entity has already been removed before it was properly added, don't bother with it
                 {
                     T result;
-                    if (SubEntityFactory.TryGenerateSubEntity<T>(ent, out result))
+                    if (SubEntityFactory.TryGenerateSubEntity(ent, out result))
                     {
                         result.Outdated += OnSubEntityOutdated;
                         _activeEntities.Add(ent, result);
