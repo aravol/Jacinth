@@ -8,6 +8,6 @@ namespace Jacinth.Components
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public class InheritComponentKeyAttribute : Attribute
     {
-        // Nothing to here but exist
+        // Nothing to do here but exist
     }
 }

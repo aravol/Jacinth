@@ -7,6 +7,8 @@ namespace Jacinth.Entities
     /// </summary>
     public static class SubEntityFactory
     {
+        #region Delegates
+
         /// <summary>
         /// Delegate used to attempt generation of a SubEntity
         /// </summary>
@@ -15,6 +17,10 @@ namespace Jacinth.Entities
         /// <param name="subEntity">The resulting SubEntity</param>
         /// <returns>True if this type of SubEntity if valid against the given Entity, False otherwise</returns>
         public delegate bool TryGenerateSubEntityHandler<T>(Entity entity, out T subEntity) where T : SubEntity;
+
+        #endregion
+
+        #region Subclass
 
         private static class GenericFactory<T>
             where T : SubEntity
@@ -36,6 +42,9 @@ namespace Jacinth.Entities
                 throw new NotImplementedException("SubEntity Generation has not been registered for type " + typeof(T).Name);
             }
         }
+        #endregion
+
+        #region Methods
 
         /// <summary>
         /// Registers the generation method for a given type of SubEntity
@@ -54,5 +63,6 @@ namespace Jacinth.Entities
         {
             return GenericFactory<T>.GenerationMethod.Invoke(entity, out subEntity);
         }
+        #endregion
     }
 }

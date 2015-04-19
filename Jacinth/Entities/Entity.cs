@@ -12,13 +12,16 @@ namespace Jacinth.Entities
     /// </summary>
     public sealed class Entity : IEquatable<Entity>
     {
+        #region Events
+
         internal event Action<Entity, ComponentTypeKey, Component> ComponentAdded;
         internal event Action<Entity, ComponentTypeKey, Component> ComponentRemoved;
-        internal event Action<Entity> EntityDestroyed;
 
         // ReSharper disable once InconsistentNaming
         // Named as per a private field due to an accessor
         private event Action<Entity> _enabled;
+        
+        public event Action<Entity> EntityDestroyed;
 
         /// <summary>
         /// Event fired when this Entity is enabled.
@@ -37,6 +40,9 @@ namespace Jacinth.Entities
 
             remove { _enabled -= value; }
         }
+        #endregion
+
+        #region Values
 
         private readonly JacinthWorld _world;
         private readonly int _hashCode;
@@ -46,6 +52,9 @@ namespace Jacinth.Entities
             = new ConcurrentDictionary<ComponentTypeKey, Component>();
 
         private bool _isEnabled;
+        #endregion
+
+        #region Properties
 
         /// <summary>
         /// Gets the World to which this Entity belongs
@@ -67,6 +76,9 @@ namespace Jacinth.Entities
         {
             get { return _isEnabled; }
         }
+        #endregion
+
+        #region Constructors
 
         /// <summary>
         /// Do not allow objects outside of Jacinth to create Entities
@@ -78,6 +90,9 @@ namespace Jacinth.Entities
             _id = Guid.NewGuid();
             _hashCode = _id.GetHashCode();
         }
+        #endregion
+
+        #region Methods
 
         /// <summary>
         /// Adds a new Component of the speicfied type to this Entity using the default Costructor
@@ -272,5 +287,6 @@ namespace Jacinth.Entities
             _enabled(this);
             _enabled = null;    // Clear the Enabled event after using it - we won't need it again
         }
+        #endregion
     }
 }

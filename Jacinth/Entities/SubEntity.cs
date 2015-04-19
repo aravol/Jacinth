@@ -8,14 +8,25 @@ namespace Jacinth.Entities
     /// </summary>
     public abstract class SubEntity
     {
-        private readonly Entity _entity;
+        #region events
 
         internal event Action<SubEntity> Outdated;
+        #endregion
+
+        #region Values
+
+        private readonly Entity _entity;
+        #endregion
+
+        #region Properties
 
         /// <summary>
         /// The Entity for whyich this SubEntity represents a specific subset of Components
         /// </summary>
         public Entity Entity { get { return _entity; } }
+        #endregion
+
+        #region Constructor
 
         internal SubEntity(Entity entity)
         {
@@ -25,6 +36,9 @@ namespace Jacinth.Entities
             _entity.ComponentRemoved += OnEntityComponentRemoved;
             _entity.EntityDestroyed += OnEntityDestroyed;
         }
+        #endregion
+
+        #region Methods
 
         /// <summary>
         /// Raises an event to indicate that this SubEntity is no longer valid and should be removed from all Processors utilizing it
@@ -54,6 +68,7 @@ namespace Jacinth.Entities
         {
             RaiseOutdated();
         }
+        #endregion
     }
 
     #region Standard Sub entities

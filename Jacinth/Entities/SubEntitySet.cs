@@ -20,11 +20,16 @@ namespace Jacinth.Entities
     internal class SubEntitySet<T> : SubEntitySet
         where T : SubEntity
     {
+        #region Values
+
         private readonly Dictionary<Entity, T> _activeEntities = new Dictionary<Entity, T>();
 
         private readonly object _entityUpdateLock = new object();
         private readonly HashSet<Entity> _entitiesToAdd = new HashSet<Entity>();
         private readonly HashSet<Entity> _entitiesToRemove = new HashSet<Entity>();
+        #endregion
+
+        #region Properties
 
         public IEnumerable<Entity> ActiveEntities
         {
@@ -35,12 +40,18 @@ namespace Jacinth.Entities
         {
             get { return _activeEntities.Values; }
         }
+        #endregion
+
+        #region Constructors
 
         static SubEntitySet()
         {
             // Force the static constructors to activate against our specified SubEntity type to ensure it can register the appropriate factory method
             RuntimeHelpers.RunClassConstructor(typeof(T).TypeHandle);
         }
+        #endregion
+
+        #region Methods
 
         internal sealed override void UpdateEntities()
         {
@@ -88,5 +99,6 @@ namespace Jacinth.Entities
             lock (_entityUpdateLock)
                 _entitiesToRemove.Add(entity);
         }
+        #endregion
     }
 }

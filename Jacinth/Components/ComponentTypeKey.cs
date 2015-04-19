@@ -10,6 +10,8 @@ namespace Jacinth.Components
     //  - a ComponentKey should exist for the lifetime of the entire application
     public sealed class ComponentTypeKey : IEquatable<ComponentTypeKey>
     {
+        #region Subclass
+
         /// <summary>
         /// Statically caches and accesses the Component Key associated with the type T
         /// </summary>
@@ -35,14 +37,23 @@ namespace Jacinth.Components
                 Key = new ComponentTypeKey(targetType);
             }
         }
+        #endregion
+
+        #region Values
 
         // Cache a hash for quick access
         private readonly int _hash;
+        #endregion
+
+        #region Properties
 
         /// <summary>
         /// Type that this ComponentKey is bound against, used for debugging purposes.
         /// </summary>
         public Type TargetType { get; private set; }
+        #endregion
+
+        #region Constructors
 
         internal ComponentTypeKey(Type targetType)
         {
@@ -53,6 +64,9 @@ namespace Jacinth.Components
                 ? Guid.NewGuid().GetHashCode()  // The best we can do to create a unique Hash: get the hash of a guaranteed-unique object
                 : TargetType.GetHashCode();     // The has code is a shortcut used in most of .NET - since we use referential equality, hash collisions are moot
         }
+        #endregion
+
+        #region Methods
 
         /// <summary>
         /// Gets a ComponentTypeKey from a given type
@@ -96,5 +110,6 @@ namespace Jacinth.Components
             // Becuase they are tied to a type via an Attribute, logical and referential equality should always be the same for ComponentKeys
             return ReferenceEquals(this, other);
         }
+        #endregion
     }
 }
