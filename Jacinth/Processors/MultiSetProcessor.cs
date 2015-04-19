@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Jacinth.Entities;
 
@@ -12,8 +11,8 @@ namespace Jacinth.Processors
         where T1 : SubEntity
         where T2 : SubEntity
     {
-        private SubEntitySet<T1> _subEntitySet1 = new SubEntitySet<T1>();
-        private SubEntitySet<T2> _subEntitySet2 = new SubEntitySet<T2>();
+        private readonly SubEntitySet<T1> _subEntitySet1 = new SubEntitySet<T1>();
+        private readonly SubEntitySet<T2> _subEntitySet2 = new SubEntitySet<T2>();
 
         /// <summary>
         /// Gets all the SubEntities of the first type currently being processed by this Processor
@@ -58,9 +57,9 @@ namespace Jacinth.Processors
         where T2 : SubEntity
         where T3 : SubEntity
     {
-        private SubEntitySet<T1> _subEntitySet1 = new SubEntitySet<T1>();
-        private SubEntitySet<T2> _subEntitySet2 = new SubEntitySet<T2>();
-        private SubEntitySet<T3> _subEntitySet3 = new SubEntitySet<T3>();
+        private readonly SubEntitySet<T1> _subEntitySet1 = new SubEntitySet<T1>();
+        private readonly SubEntitySet<T2> _subEntitySet2 = new SubEntitySet<T2>();
+        private readonly SubEntitySet<T3> _subEntitySet3 = new SubEntitySet<T3>();
 
         /// <summary>
         /// Gets all the SubEntities of the first type currently being processed by this Processor
@@ -116,10 +115,10 @@ namespace Jacinth.Processors
         where T3 : SubEntity
         where T4 : SubEntity
     {
-        private SubEntitySet<T1> _subEntitySet1 = new SubEntitySet<T1>();
-        private SubEntitySet<T2> _subEntitySet2 = new SubEntitySet<T2>();
-        private SubEntitySet<T3> _subEntitySet3 = new SubEntitySet<T3>();
-        private SubEntitySet<T4> _subEntitySet4 = new SubEntitySet<T4>();
+        private readonly SubEntitySet<T1> _subEntitySet1 = new SubEntitySet<T1>();
+        private readonly SubEntitySet<T2> _subEntitySet2 = new SubEntitySet<T2>();
+        private readonly SubEntitySet<T3> _subEntitySet3 = new SubEntitySet<T3>();
+        private readonly SubEntitySet<T4> _subEntitySet4 = new SubEntitySet<T4>();
 
         /// <summary>
         /// Gets all the SubEntities of the first type currently being processed by this Processor

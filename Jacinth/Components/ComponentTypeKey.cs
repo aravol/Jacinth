@@ -16,6 +16,8 @@ namespace Jacinth.Components
         private static class StaticKey<T>
             where T : Component
         {
+            // ReSharper disable once StaticMemberInGenericType
+            // Intentionally trying to get one Key per generic type, so that generic lookups are a matter of method-call -> member-access
             public static ComponentTypeKey Key { get; private set; }
 
             static StaticKey()
@@ -24,7 +26,11 @@ namespace Jacinth.Components
 
                 // Walk the inheritance tree as far as requested by Inherit Component Key flags
                 while (targetType.GetCustomAttribute<InheritComponentKeyAttribute>(false) != null)
+                {
+                    // ReSharper disable once PossibleNullReferenceException
+                    // This should never be a null because base Component type Component does not have the InheritComponentKeyAttribute
                     targetType = targetType.BaseType;
+                }
 
                 Key = new ComponentTypeKey(targetType);
             }

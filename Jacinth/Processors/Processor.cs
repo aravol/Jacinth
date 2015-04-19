@@ -48,7 +48,7 @@ namespace Jacinth.Processors
     public abstract class Processor<T> : Processor
         where T : SubEntity
     {
-        private SubEntitySet<T> _subEntitySet = new SubEntitySet<T>();
+        private readonly SubEntitySet<T> _subEntitySet = new SubEntitySet<T>();
 
         /// <summary>
         /// Gets all the SubEntities currently being processed by this Processor

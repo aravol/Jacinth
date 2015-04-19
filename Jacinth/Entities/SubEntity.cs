@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Jacinth.Components;
-using Jacinth.Processors;
 
 namespace Jacinth.Entities
 {
@@ -97,17 +92,14 @@ namespace Jacinth.Entities
         {
             T1 component1;
 
-            if (entity.TryGetComponent<T1>(out component1))
+            if (entity.TryGetComponent(out component1))
             {
                 subEntity = new SubEntity<T1>(entity, component1);
                 return true;
             }
 
-            else
-            {
-                subEntity = null;
-                return false;
-            }
+            subEntity = null;
+            return false;
         }
 
         /// <summary>
@@ -161,17 +153,14 @@ namespace Jacinth.Entities
         {
             T1 component1;
             T2 component2;
-            if(entity.TryGetComponent<T1>(out component1)
-                && entity.TryGetComponent<T2>(out component2))
+            if(entity.TryGetComponent(out component1)
+                && entity.TryGetComponent(out component2))
             {
                 subEntity = new SubEntity<T1,T2>(entity, component1, component2);
                 return true;
             }
-            else
-            {
-                subEntity = null;
-                return false;
-            }
+            subEntity = null;
+            return false;
         }
 
         /// <summary>
@@ -236,18 +225,15 @@ namespace Jacinth.Entities
             T1 component1;
             T2 component2;
             T3 component3;
-            if(entity.TryGetComponent<T1>(out component1)
-                && entity.TryGetComponent<T2>(out component2)
-                && entity.TryGetComponent<T3>(out component3))
+            if(entity.TryGetComponent(out component1)
+                && entity.TryGetComponent(out component2)
+                && entity.TryGetComponent(out component3))
             {
                 subEntity = new SubEntity<T1, T2, T3>(entity, component1, component2, component3);
                 return true;
             }
-            else
-            {
-                subEntity = null;
-                return false;
-            }
+            subEntity = null;
+            return false;
         }
         
         /// <summary>
@@ -323,19 +309,16 @@ namespace Jacinth.Entities
             T2 component2;
             T3 component3;
             T4 component4;
-            if (entity.TryGetComponent<T1>(out component1)
-                && entity.TryGetComponent<T2>(out component2)
-                && entity.TryGetComponent<T3>(out component3)
-                && entity.TryGetComponent<T4>(out component4))
+            if (entity.TryGetComponent(out component1)
+                && entity.TryGetComponent(out component2)
+                && entity.TryGetComponent(out component3)
+                && entity.TryGetComponent(out component4))
             {
                 subEntity = new SubEntity<T1, T2, T3, T4>(entity, component1, component2, component3, component4);
                 return true;
             }
-            else
-            {
-                subEntity = null;
-                return false;
-            }
+            subEntity = null;
+            return false;
         }
         
         /// <summary>
@@ -423,20 +406,17 @@ namespace Jacinth.Entities
             T4 component4;
             T5 component5;
 
-            if (entity.TryGetComponent<T1>(out component1)
-                && entity.TryGetComponent<T2>(out component2)
-                && entity.TryGetComponent<T3>(out component3)
-                && entity.TryGetComponent<T4>(out component4)
-                && entity.TryGetComponent<T5>(out component5))
+            if (entity.TryGetComponent(out component1)
+                && entity.TryGetComponent(out component2)
+                && entity.TryGetComponent(out component3)
+                && entity.TryGetComponent(out component4)
+                && entity.TryGetComponent(out component5))
             {
                 subEntity = new SubEntity<T1, T2, T3, T4, T5>(entity, component1, component2, component3, component4, component5);
                 return true;
             }
-            else
-            {
-                subEntity = null;
-                return false;
-            }
+            subEntity = null;
+            return false;
         }
         
         /// <summary>

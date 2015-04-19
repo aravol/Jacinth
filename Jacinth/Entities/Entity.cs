@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using Jacinth.Components;
 
@@ -18,12 +16,36 @@ namespace Jacinth.Entities
         internal event Action<Entity, ComponentTypeKey, Component> ComponentRemoved;
         internal event Action<Entity> EntityDestroyed;
 
+        // ReSharper disable once InconsistentNaming
+        // Named as per a private field due to an accessor
+        private event Action<Entity> _enabled;
+
+        /// <summary>
+        /// Event fired when this Entity is enabled.
+        ///  Immediately calls any new handlers added to it if this Entity is already enabled
+        /// </summary>
+        public event Action<Entity> Enabled
+        {
+            add
+            {
+                // Invoke immediately if Entity is already enabled
+                if (IsEnabled)
+                    value(this);
+                else
+                    _enabled += value;
+            }
+
+            remove { _enabled -= value; }
+        }
+
         private readonly JacinthWorld _world;
         private readonly int _hashCode;
         private readonly Guid _id;
 
-        private ConcurrentDictionary<ComponentTypeKey, Component> _components
+        private readonly ConcurrentDictionary<ComponentTypeKey, Component> _components
             = new ConcurrentDictionary<ComponentTypeKey, Component>();
+
+        private bool _isEnabled;
 
         /// <summary>
         /// Gets the World to which this Entity belongs
@@ -39,10 +61,19 @@ namespace Jacinth.Entities
         }
 
         /// <summary>
+        /// Gets whether this Entity is enabled and ready to be used within the World
+        /// </summary>
+        public bool IsEnabled
+        {
+            get { return _isEnabled; }
+        }
+
+        /// <summary>
         /// Do not allow objects outside of Jacinth to create Entities
         /// </summary>
         internal Entity(JacinthWorld world)
         {
+            _isEnabled = false;
             _world = world;
             _id = Guid.NewGuid();
             _hashCode = _id.GetHashCode();
@@ -87,7 +118,7 @@ namespace Jacinth.Entities
             where T : Component
         {
             T result;
-            return TryGetComponent<T>(out result) ? null : result;
+            return TryGetComponent(out result) ? null : result;
         }
 
         /// /// <summary>
@@ -104,8 +135,7 @@ namespace Jacinth.Entities
             created = !_components.TryGetValue(key, out result);
             if (!created)
                 return (T) result; // Hard cast to propogate an InvalidCastException if used incorrectly
-            else
-                return AddComponent<T>();
+            return AddComponent<T>();
         }
                
         /// /// <summary>
@@ -131,9 +161,8 @@ namespace Jacinth.Entities
         {
             var key = ComponentTypeKey.GetKey<T>();
             Component rawComponent;
-            bool result;
-            
-            result = _components.TryGetValue(key, out rawComponent);
+
+            var result = _components.TryGetValue(key, out rawComponent);
 
             component = rawComponent as T;
             return result
@@ -222,7 +251,26 @@ namespace Jacinth.Entities
         /// <returns>True if these Entities are logcally the same, False otherwise</returns>
         public bool Equals(Entity other)
         {
-            return this._id == other._id;
+            return _id == other._id;
+        }
+
+        /// <summary>
+        /// Activates this Entity for use in the World.
+        /// <exception cref="System.InvalidOperationException">
+        /// Throws an Exception if this Entity has already been Enabled
+        /// </exception>
+        /// </summary>
+        public void Enable()
+        {
+            if(IsEnabled) throw new InvalidOperationException("Attempted to Enable and Entity which was already Enabled");
+
+            // Set enabled flag now in case Enabled event handlers attempt to attach anything
+            _isEnabled = true;
+
+            if (_enabled == null) return;
+
+            _enabled(this);
+            _enabled = null;    // Clear the Enabled event after using it - we won't need it again
         }
     }
 }
