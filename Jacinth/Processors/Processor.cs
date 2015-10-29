@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Jacinth.Entities;
 
@@ -11,12 +11,10 @@ namespace Jacinth.Processors
     // Base calss for inclusion into collections of disparate types
     public abstract class Processor
     {
-        private readonly JacinthWorld _world;
-
         /// <summary>
         /// The World this Processor is resident in
         /// </summary>
-        public JacinthWorld World { get { return _world; } }
+        public JacinthWorld World { get; }
 
         /// <summary>
         /// The Loop controlling this Processor's execution timing and threading
@@ -27,7 +25,7 @@ namespace Jacinth.Processors
         /// Creates a new Processor within the specified World
         /// </summary>
         /// <param name="world">The World in which this Processor exists</param>
-        protected Processor(JacinthWorld world) { _world = world; }
+        protected Processor(JacinthWorld world) { World = world; }
 
         /// <summary>
         /// Processes the entities in this Processor
@@ -53,10 +51,7 @@ namespace Jacinth.Processors
         /// <summary>
         /// Gets all the SubEntities currently being processed by this Processor
         /// </summary>
-        public IEnumerable<T> ActiveSubEntities
-        {
-            get { return _subEntitySet.ActiveSubEntities; }
-        }
+        public IEnumerable<T> ActiveSubEntities => _subEntitySet.ActiveSubEntities;
 
         /// <summary>
         /// Creates a new Processor within the specified World
@@ -71,9 +66,6 @@ namespace Jacinth.Processors
         /// <summary>
         /// Updates the Entities in this Processor, adding and removing any queued Entities appropriately
         /// </summary>
-        internal sealed override void UpdateEntities()
-        {
-            _subEntitySet.UpdateEntities();
-        }
+        internal sealed override void UpdateEntities() => _subEntitySet.UpdateEntities();
     }
 }

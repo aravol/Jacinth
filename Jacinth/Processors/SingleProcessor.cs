@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Jacinth.Components;
 using Jacinth.Entities;
 
@@ -23,7 +23,8 @@ namespace Jacinth.Processors
         /// <param name="deltaTime">The time since the last execution on this Loop</param>
         protected internal sealed override void Process(TimeSpan deltaTime)
         {
-            foreach (var subEntity in ActiveSubEntities) Process(deltaTime, subEntity);
+            foreach (var subEntity in ActiveSubEntities)
+                Process(deltaTime, subEntity);
         }
 
         /// <summary>

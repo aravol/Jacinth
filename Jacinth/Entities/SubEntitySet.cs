@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
@@ -31,15 +31,9 @@ namespace Jacinth.Entities
 
         #region Properties
 
-        public IEnumerable<Entity> ActiveEntities
-        {
-            get { return _activeEntities.Keys; }
-        }
+        public IEnumerable<Entity> ActiveEntities => _activeEntities.Keys;
 
-        public IEnumerable<T> ActiveSubEntities
-        {
-            get { return _activeEntities.Values; }
-        }
+        public IEnumerable<T> ActiveSubEntities => _activeEntities.Values;
         #endregion
 
         #region Constructors
@@ -83,10 +77,7 @@ namespace Jacinth.Entities
             }
         }
 
-        private void OnSubEntityOutdated(SubEntity subEntity)
-        {
-            QueueEntityRemove(subEntity.Entity);
-        }
+        private void OnSubEntityOutdated(SubEntity subEntity) => QueueEntityRemove(subEntity.Entity);
 
         internal sealed override void QueueEntityAdd(Entity entity)
         {

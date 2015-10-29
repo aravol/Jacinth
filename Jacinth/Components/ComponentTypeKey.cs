@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 
 namespace Jacinth.Components
@@ -50,7 +50,7 @@ namespace Jacinth.Components
         /// <summary>
         /// Type that this ComponentKey is bound against, used for debugging purposes.
         /// </summary>
-        public Type TargetType { get; private set; }
+        public Type TargetType { get; }
         #endregion
 
         #region Constructors
@@ -97,19 +97,13 @@ namespace Jacinth.Components
         /// <summary>
         /// Generates a Hash Code for this instance
         /// </summary>
-        public override int GetHashCode()
-        {
-            return _hash;
-        }
+        public override int GetHashCode() => _hash;
 
         /// <summary>
         /// Determines equality between this instance and another
         /// </summary>
-        public bool Equals(ComponentTypeKey other)
-        {
-            // Becuase they are tied to a type via an Attribute, logical and referential equality should always be the same for ComponentKeys
-            return ReferenceEquals(this, other);
-        }
+        // Becuase they are tied to a type via an Attribute and a lookup, logical and referential equality should always be the same for ComponentKeys
+        public bool Equals(ComponentTypeKey other) => ReferenceEquals(this, other);
         #endregion
     }
 }

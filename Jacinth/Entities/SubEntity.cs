@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Jacinth.Components;
 
 namespace Jacinth.Entities
@@ -13,28 +13,23 @@ namespace Jacinth.Entities
         internal event Action<SubEntity> Outdated;
         #endregion
 
-        #region Values
-
-        private readonly Entity _entity;
-        #endregion
-
         #region Properties
 
         /// <summary>
         /// The Entity for whyich this SubEntity represents a specific subset of Components
         /// </summary>
-        public Entity Entity { get { return _entity; } }
+        public Entity Entity { get; }
         #endregion
 
         #region Constructor
 
         internal SubEntity(Entity entity)
         {
-            _entity = entity;
+            Entity = entity;
 
-            _entity.ComponentAdded += OnEntityComponentAdded;
-            _entity.ComponentRemoved += OnEntityComponentRemoved;
-            _entity.EntityDestroyed += OnEntityDestroyed;
+            Entity.ComponentAdded += OnEntityComponentAdded;
+            Entity.ComponentRemoved += OnEntityComponentRemoved;
+            Entity.EntityDestroyed += OnEntityDestroyed;
         }
         #endregion
 
@@ -45,7 +40,7 @@ namespace Jacinth.Entities
         /// </summary>
         protected void RaiseOutdated()
         {
-            if (Outdated != null) Outdated(this);
+            Outdated?.Invoke(this);
 
             // Detach event listeners
             Outdated = null;
@@ -64,10 +59,7 @@ namespace Jacinth.Entities
         /// <summary>
         /// Handler called when the underlying Entity is Destroyed
         /// </summary>
-        protected virtual void OnEntityDestroyed(Entity entity)
-        {
-            RaiseOutdated();
-        }
+        protected virtual void OnEntityDestroyed(Entity entity) => RaiseOutdated();
         #endregion
     }
 
@@ -80,12 +72,10 @@ namespace Jacinth.Entities
     public class SubEntity<T1> : SubEntity
         where T1 : Component
     {
-        private readonly T1 _component1;
-
         /// <summary>
         /// Gets the Component monitored by this SubEntity
         /// </summary>
-        public T1 Component1 { get { return _component1; } }
+        public T1 Component1 { get; }
 
         // Registers the appropriate Factory for this SubEntity type
         static SubEntity()
@@ -99,7 +89,7 @@ namespace Jacinth.Entities
         protected SubEntity(Entity entity, T1 component1)
             : base(entity)
         {
-            _component1 = component1;
+            Component1 = component1;
         }
 
         // Generation method for this type of SubEntity
@@ -136,18 +126,15 @@ namespace Jacinth.Entities
         where T1 : Component
         where T2 : Component
     {
-        private readonly T1 _component1;
-        private readonly T2 _component2;
-
         /// <summary>
         /// Gets the first Component monitored by this SubEntity
         /// </summary>
-        public T1 Component1 { get { return _component1; } }
+        public T1 Component1 { get; }
         
         /// <summary>
         /// Gets the second Component monitored by this SubEntity
         /// </summary>
-        public T2 Component2 { get { return _component2; } }
+        public T2 Component2 { get; }
 
         static SubEntity()
         {
@@ -160,8 +147,8 @@ namespace Jacinth.Entities
         protected SubEntity(Entity entity, T1 component1, T2 component2)
             : base(entity)
         {
-            _component1 = component1;
-            _component2 = component2;
+            Component1 = component1;
+            Component2 = component2;
         }
 
         private static bool GenerateSubEntity(Entity entity, out SubEntity<T1, T2> subEntity)
@@ -199,25 +186,21 @@ namespace Jacinth.Entities
         where T1 : Component
         where T2 : Component
         where T3 : Component
-    {
-        private readonly T1 _component1;
-        private readonly T2 _component2;
-        private readonly T3 _component3;
-        
+    {        
         /// <summary>
         /// Gets the first Component monitored by this SubEntity
         /// </summary>
-        public T1 Component1 { get { return _component1; } }
+        public T1 Component1 { get; }
         
         /// <summary>
         /// Gets the second Component monitored by this SubEntity
         /// </summary>
-        public T2 Component2 { get { return _component2; } }
+        public T2 Component2 { get; }
         
         /// <summary>
         /// Gets the fourth Component monitored by this SubEntity
         /// </summary>
-        public T3 Component3 { get { return _component3; } }
+        public T3 Component3 { get; }
 
         static SubEntity()
         {
@@ -230,9 +213,9 @@ namespace Jacinth.Entities
         protected SubEntity(Entity entity, T1 component1, T2 component2, T3 component3)
             : base(entity)
         {
-            _component1 = component1;
-            _component2 = component2;
-            _component3 = component3;
+            Component1 = component1;
+            Component2 = component2;
+            Component3 = component3;
         }
 
         private static bool GenerateSubEntity(Entity entity, out SubEntity<T1, T2, T3> subEntity)
@@ -275,31 +258,26 @@ namespace Jacinth.Entities
         where T2 : Component
         where T3 : Component
         where T4 : Component
-    {
-        private readonly T1 _component1;
-        private readonly T2 _component2;
-        private readonly T3 _component3;
-        private readonly T4 _component4;
-        
+    {        
         /// <summary>
         /// Gets the first Component monitored by this SubEntity
         /// </summary>
-        public T1 Component1 { get { return _component1; } }
+        public T1 Component1 { get; }
 
         /// <summary>
         /// Gets the second Component monitored by this SubEntity
         /// </summary>
-        public T2 Component2 { get { return _component2; } }
+        public T2 Component2 { get; }
 
         /// <summary>
         /// Gets the third Component monitored by this SubEntity
         /// </summary>
-        public T3 Component3 { get { return _component3; } }
+        public T3 Component3 { get; }
 
         /// <summary>
         /// Gets the fourth Component monitored by this SubEntity
         /// </summary>
-        public T4 Component4 { get { return _component4; } }
+        public T4 Component4 { get; }
 
         static SubEntity()
         {
@@ -312,10 +290,10 @@ namespace Jacinth.Entities
         protected SubEntity(Entity entity, T1 component1, T2 component2, T3 component3, T4 component4)
             : base(entity)
         {
-            _component1 = component1;
-            _component2 = component2;
-            _component3 = component3;
-            _component4 = component4;
+            Component1 = component1;
+            Component2 = component2;
+            Component3 = component3;
+            Component4 = component4;
         }
 
         private static bool GenerateSubEntity(Entity entity, out SubEntity<T1, T2, T3, T4> subEntity)
@@ -364,36 +342,30 @@ namespace Jacinth.Entities
         where T4 : Component
         where T5 : Component
     {
-        private readonly T1 _component1;
-        private readonly T2 _component2;
-        private readonly T3 _component3;
-        private readonly T4 _component4;
-        private readonly T5 _component5;
-
         /// <summary>
         /// Gets the first Component monitored by this SubEntity
         /// </summary>
-        public T1 Component1 { get { return _component1; } }
+        public T1 Component1 { get; }
 
         /// <summary>
         /// Gets the second Component monitored by this SubEntity
         /// </summary>
-        public T2 Component2 { get { return _component2; } }
+        public T2 Component2 { get; }
 
         /// <summary>
         /// Gets the third Component monitored by this SubEntity
         /// </summary>
-        public T3 Component3 { get { return _component3; } }
+        public T3 Component3 { get; }
 
         /// <summary>
         /// Gets the fourth Component monitored by this SubEntity
         /// </summary>
-        public T4 Component4 { get { return _component4; } }
+        public T4 Component4 { get; }
         
         /// <summary>
         /// Gets the fifth Component monitored by this SubEntity
         /// </summary>
-        public T5 Component5 { get { return _component5; } }
+        public T5 Component5 { get; }
 
         static SubEntity()
         {
@@ -406,11 +378,11 @@ namespace Jacinth.Entities
         protected SubEntity(Entity entity, T1 component1, T2 component2, T3 component3, T4 component4, T5 component5)
             : base(entity)
         {
-            _component1 = component1;
-            _component2 = component2;
-            _component3 = component3;
-            _component4 = component4;
-            _component5 = component5;
+            Component1 = component1;
+            Component2 = component2;
+            Component3 = component3;
+            Component4 = component4;
+            Component5 = component5;
         }
 
         private static bool GenerateSubEntity(Entity entity, out SubEntity<T1, T2, T3, T4, T5> subEntity)

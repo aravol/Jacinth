@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +21,10 @@ namespace Jacinth.Entities
         // Named as per a private field due to an accessor
         private event Action<Entity> _enabled;
         
+        /// <summary>
+        /// Event fired when this Entity is destroyed.
+        ///  Further handlers attached during the processing of entity destruction will NOT be handled.
+        /// </summary>
         public event Action<Entity> EntityDestroyed;
 
         /// <summary>
@@ -48,8 +52,7 @@ namespace Jacinth.Entities
         private readonly int _hashCode;
         private readonly Guid _id;
 
-        private readonly ConcurrentDictionary<ComponentTypeKey, Component> _components
-            = new ConcurrentDictionary<ComponentTypeKey, Component>();
+        private readonly ConcurrentDictionary<ComponentTypeKey, Component> _components;
 
         private bool _isEnabled;
         #endregion
@@ -59,23 +62,17 @@ namespace Jacinth.Entities
         /// <summary>
         /// Gets the World to which this Entity belongs
         /// </summary>
-        public JacinthWorld World { get { return _world; } }
+        public JacinthWorld World => _world;
 
         /// <summary>
         /// <para>Gets all Components attached to this Entity.</para>
         /// </summary>
-        public IEnumerable<Component> Components
-        {
-            get { return _components.Values; }
-        }
+        public IEnumerable<Component> Components => _components.Values;
 
         /// <summary>
         /// Gets whether this Entity is enabled and ready to be used within the World
         /// </summary>
-        public bool IsEnabled
-        {
-            get { return _isEnabled; }
-        }
+        public bool IsEnabled => _isEnabled;
         #endregion
 
         #region Constructors
@@ -89,6 +86,7 @@ namespace Jacinth.Entities
             _world = world;
             _id = Guid.NewGuid();
             _hashCode = _id.GetHashCode();
+            _components = new ConcurrentDictionary<ComponentTypeKey, Component>();
         }
         #endregion
 
@@ -119,9 +117,7 @@ namespace Jacinth.Entities
             var key = ComponentTypeKey.GetKey<T>();
 
             if (_components.TryAdd(key, component))
-            {
                 RaiseComponentAdded(key, component);
-            }
         }
 
         /// <summary>
@@ -218,31 +214,20 @@ namespace Jacinth.Entities
         }
 
         private void RaiseComponentRemoved(ComponentTypeKey key, Component component)
-        {
-            Task.Run(() =>
-            {
-                if(ComponentRemoved != null)
-                    ComponentRemoved(this, key, component);
-            });
-        }
-        private void RaiseComponentAdded(ComponentTypeKey key, Component component)
-        {
-            Task.Run(() =>
-            {
-                if(ComponentAdded != null)
-                    ComponentAdded(this, key, component);
-            });
-        }
+            => Task.Run(() => ComponentRemoved?.Invoke(this, key, component));
 
+        private void RaiseComponentAdded(ComponentTypeKey key, Component component)
+            => Task.Run(() => ComponentAdded?.Invoke(this, key, component));
+        
         /// <summary>
         /// Removes all Components from this Entity an removes it from the World
         /// </summary>
         public void Destroy()
         {
-            Task.Run(() =>
-            {
-                if (EntityDestroyed != null) EntityDestroyed(this);
-            });
+            // Copy entity destroyed handlers to ensure entity destroyed events take place
+            var entityDestroyed = EntityDestroyed;
+
+            Task.Run(() => entityDestroyed?.Invoke(this));
 
             // Detach all event listeners
             EntityDestroyed = null;
@@ -254,20 +239,14 @@ namespace Jacinth.Entities
         /// Gets the Hash Code of this Entity, which is determined when the Entity is instantiated
         /// </summary>
         /// <returns>The Hash Code of this Entity</returns>
-        public override int GetHashCode()
-        {
-            return _hashCode;
-        }
+        public override int GetHashCode() => _hashCode;        
 
         /// <summary>
         /// Checks whether this Entity is the same as another Entity
         /// </summary>
         /// <param name="other">The other Entity to compare against</param>
         /// <returns>True if these Entities are logcally the same, False otherwise</returns>
-        public bool Equals(Entity other)
-        {
-            return _id == other._id;
-        }
+        public bool Equals(Entity other) => _id == other._id;
 
         /// <summary>
         /// Activates this Entity for use in the World.

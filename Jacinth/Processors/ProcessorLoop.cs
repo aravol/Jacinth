@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -16,23 +16,21 @@ namespace Jacinth.Processors
         /// used as a default when Loop is not specified for a Processor
         /// </summary>
         public const string UpdateLoopName = "Update";
-
-        private readonly string _name;
-        private readonly JacinthWorld _world;
+        
         private readonly List<Processor> _processors = new List<Processor>();
         private readonly Stopwatch _deltaWatch = Stopwatch.StartNew();
 
-        private Task _entityUpdates = Task.Run(() => { });  // Nop-op default for when this loops is first created
+        private Task _entityUpdates;
 
         /// <summary>
         /// Gets the World to which this Loop is attached
         /// </summary>
-        public JacinthWorld World { get { return _world; } }
+        public JacinthWorld World { get; }
 
         /// <summary>
         /// Gets the Name of this loop, which is how it is keyed
         /// </summary>
-        public string Name { get { return _name; } }
+        public string Name { get; }
 
         /// <summary>
         /// Gets or sets whether to execute each Processor in this Loop one-at-a-time or in parallel
@@ -42,12 +40,12 @@ namespace Jacinth.Processors
         /// <summary>
         /// Gets all Processors currently subscribed to this ProcessorLoop
         /// </summary>
-        public IEnumerable<Processor> Processors { get { return _processors; } } 
+        public IEnumerable<Processor> Processors => _processors; 
 
         internal ProcessorLoop(string name, JacinthWorld world)
         {
-            _name = name;
-            _world = world;
+            Name = name;
+            World = world;
         }
 
         /// <summary>
@@ -56,7 +54,7 @@ namespace Jacinth.Processors
         public void Execute()
         {
             // Wait for any Entity Updates to finish processing
-            _entityUpdates.Wait();
+            _entityUpdates?.Wait();
 
             // Take the current delta time and restart the stopwatch
             var deltaTime = _deltaWatch.Elapsed;    // By caching this value, there will be a slight inaccuracy due to the actual time taken by each processor,
@@ -65,7 +63,7 @@ namespace Jacinth.Processors
 
             foreach(var proc in SynchronousExecution
                 ? Processors
-                : (IEnumerable<Processor>)(Processors.AsParallel()))
+                : Processors.AsParallel())
             {
                 proc.Process(deltaTime);
             }
@@ -79,7 +77,7 @@ namespace Jacinth.Processors
         {
             foreach (var proc in SynchronousExecution
                 ? Processors
-                : (IEnumerable<Processor>)(Processors.AsParallel()))
+                : Processors.AsParallel())
             {
                 proc.UpdateEntities();
             }

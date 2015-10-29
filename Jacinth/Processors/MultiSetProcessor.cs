@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Jacinth.Entities;
 
@@ -17,18 +17,12 @@ namespace Jacinth.Processors
         /// <summary>
         /// Gets all the SubEntities of the first type currently being processed by this Processor
         /// </summary>
-        public IEnumerable<T1> ActiveSubEntities1
-        {
-            get { return _subEntitySet1.ActiveSubEntities; }
-        }
+        public IEnumerable<T1> ActiveSubEntities1 => _subEntitySet1.ActiveSubEntities;
 
         /// <summary>
         /// Gets all the SubEntities of the second type currently being processed by this Processor
         /// </summary>
-        public IEnumerable<T2> ActiveSubEntities2
-        {
-            get { return _subEntitySet2.ActiveSubEntities; }
-        }
+        public IEnumerable<T2> ActiveSubEntities2 => _subEntitySet2.ActiveSubEntities;
 
         /// <summary>
         /// Creates a new MultiSetProcessor in the given Jacinth World
@@ -64,26 +58,17 @@ namespace Jacinth.Processors
         /// <summary>
         /// Gets all the SubEntities of the first type currently being processed by this Processor
         /// </summary>
-        public IEnumerable<T1> ActiveSubEntities1
-        {
-            get { return _subEntitySet1.ActiveSubEntities; }
-        }
+        public IEnumerable<T1> ActiveSubEntities1 => _subEntitySet1.ActiveSubEntities;
 
         /// <summary>
         /// Gets all the SubEntities of the second type currently being processed by this Processor
         /// </summary>
-        public IEnumerable<T2> ActiveSubEntities2
-        {
-            get { return _subEntitySet2.ActiveSubEntities; }
-        }
+        public IEnumerable<T2> ActiveSubEntities2 => _subEntitySet2.ActiveSubEntities;
 
         /// <summary>
         /// Gets all the SubEntities of the third type currently being processed by this Processor
         /// </summary>
-        public IEnumerable<T3> ActiveSubEntities3
-        {
-            get { return _subEntitySet3.ActiveSubEntities; }
-        }
+        public IEnumerable<T3> ActiveSubEntities3 => _subEntitySet3.ActiveSubEntities;
 
         /// <summary>
         /// Creates a new MultiSetProcessor in the given Jacinth World
@@ -123,34 +108,22 @@ namespace Jacinth.Processors
         /// <summary>
         /// Gets all the SubEntities of the first type currently being processed by this Processor
         /// </summary>
-        public IEnumerable<T1> ActiveSubEntities1
-        {
-            get { return _subEntitySet1.ActiveSubEntities; }
-        }
+        public IEnumerable<T1> ActiveSubEntities1 => _subEntitySet1.ActiveSubEntities;
 
         /// <summary>
         /// Gets all the SubEntities of the second type currently being processed by this Processor
         /// </summary>
-        public IEnumerable<T2> ActiveSubEntities2
-        {
-            get { return _subEntitySet2.ActiveSubEntities; }
-        }
+        public IEnumerable<T2> ActiveSubEntities2 => _subEntitySet2.ActiveSubEntities;
 
         /// <summary>
         /// Gets all the SubEntities of the third type currently being processed by this Processor
         /// </summary>
-        public IEnumerable<T3> ActiveSubEntities3
-        {
-            get { return _subEntitySet3.ActiveSubEntities; }
-        }
+        public IEnumerable<T3> ActiveSubEntities3 => _subEntitySet3.ActiveSubEntities;
 
         /// <summary>
         /// Gets all the SubEntities of the fourth type currently being processed by this Processor
         /// </summary>
-        public IEnumerable<T4> ActiveSubEntities4
-        {
-            get { return _subEntitySet4.ActiveSubEntities; }
-        }
+        public IEnumerable<T4> ActiveSubEntities4 => _subEntitySet4.ActiveSubEntities;
 
         /// <summary>
         /// Creates a new MultiSetProcessor in the given Jacinth World

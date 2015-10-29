@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -39,7 +39,6 @@ namespace Jacinth
             {
                 // Do not allow access to the modifiable Dictionary when the world has already beein initialized
                 if (Initialized) throw new InvalidOperationException();
-
                 return _processorLoops;
             }
         }
@@ -63,35 +62,23 @@ namespace Jacinth
         /// <summary>
         /// <para>Gets all Entities currently active in this World.</para>
         /// </summary>
-        public IEnumerable<Entity> Entities
-        {
-            get { return _entities; }
-        }
+        public IEnumerable<Entity> Entities => _entities;
 
         /// <summary>
         /// <para>Gets all Components currently active in this World.</para>
         /// <para>WARNING: Expensive operation. May need optimization.</para>
         /// </summary>
-        public IEnumerable<Component> Components
-        {
-            get { return Entities.SelectMany(e => e.Components); }
-        }
-        
+        public IEnumerable<Component> Components => Entities.SelectMany(e => e.Components);
+
         /// <summary>
         /// Gets all Processor Loops active in this World in a Dictionary keyed by Name
         /// </summary>
-        public IReadOnlyDictionary<string, ProcessorLoop> ProcessorLoops
-        {
-            get { return _processorLoops; }
-        }
+        public IReadOnlyDictionary<string, ProcessorLoop> ProcessorLoops => _processorLoops;
 
         /// <summary>
         /// Gets all Processors active in this World
         /// </summary>
-        public IEnumerable<Processor> Processors
-        {
-            get { return _processors; }
-        }
+        public IEnumerable<Processor> Processors => _processors;
         #endregion
 
         #region Constructors
@@ -138,10 +125,7 @@ namespace Jacinth
                 _entities.Remove(entity);
         }
 
-        private void OnComponentAdded(Entity entity, ComponentTypeKey key, Component component)
-        {
-            RaiseEntityUpdated(entity);
-        }
+        private void OnComponentAdded(Entity entity, ComponentTypeKey key, Component component) => RaiseEntityUpdated(entity);
 
         /// <summary>
         /// Initializes the world and begins processing Entities
@@ -184,11 +168,7 @@ namespace Jacinth
             return result;
         }
 
-        private void RaiseEntityUpdated(Entity target)
-        {
-            if (EntityUpdated != null)
-                EntityUpdated(target);
-        }
+        private void RaiseEntityUpdated(Entity target) => EntityUpdated?.Invoke(target);
         #endregion
     }
 }
