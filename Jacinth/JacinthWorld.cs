@@ -132,6 +132,8 @@ namespace Jacinth
         /// </summary>
         public void Initialize()
         {
+            if (Initialized) throw new InvalidOperationException();
+
             foreach (var procType in AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(a => a.GetTypes())
                 .Where(t => t.IsSubclassOf(typeof (Processor))
