@@ -36,6 +36,7 @@
     <Compile Include="Components\ComponentTypeKey.cs" />
     <Compile Include="Components\InheritComponentKeyAttribute.cs" />
     <Compile Include="Entities\Entity.cs" />
+    <Compile Include="Entities\EntityBatch.cs" />
     <Compile Include="Entities\SubEntity.cs" />
     <Compile Include="Entities\SubEntityFactory.cs" />
     <Compile Include="Entities\SubEntitySet.cs" />

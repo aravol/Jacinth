@@ -24,7 +24,7 @@ namespace Jacinth
         #region Values
 
         private readonly object _entityLock = new object();
-        private readonly List<Entity> _entities = new List<Entity>();
+        private readonly HashSet<Entity> _entities = new HashSet<Entity>();
         private readonly Dictionary<string, ProcessorLoop> _processorLoops = new Dictionary<string, ProcessorLoop>();
         private readonly List<Processor> _processors = new List<Processor>();
         #endregion
@@ -89,7 +89,7 @@ namespace Jacinth
         /// <param name="initialize">True to Initialize the World immediately, False otherwise</param>
         public JacinthWorld(bool initialize = true)
         {
-            if (initialize) Initialize();
+            if (initialize) Initialize(true);
         }
         #endregion
 
@@ -108,10 +108,16 @@ namespace Jacinth
             return result;
         }
 
-        private void EntityOnEnabled(Entity entity)
+        public EntityBatch CreateEntityBatch()
+        {
+            return new EntityBatch(this);
+        }
+
+        internal void EntityOnEnabled(Entity entity)
         {
             lock (_entityLock)
-                _entities.Add(entity);
+                if (!_entities.Add(entity))
+                    return;
 
             entity.ComponentAdded += OnComponentAdded;
 
@@ -130,25 +136,26 @@ namespace Jacinth
         /// <summary>
         /// Initializes the world and begins processing Entities
         /// </summary>
-        public void Initialize()
+        public void Initialize(bool discover)
         {
             if (Initialized) throw new InvalidOperationException();
 
-            foreach (var procType in AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(a => a.GetTypes())
-                .Where(t => t.IsSubclassOf(typeof (Processor))
-                    && t.IsAbstract == false
-                    && t.ContainsGenericParameters == false))
-            {
-                var loopAtt = procType.GetCustomAttribute<JacinthProcessorAttribute>();
-                var loopKey = loopAtt == null
-                    ? ProcessorLoop.UpdateLoopName  // Default to the "Update" loop when none is declared
-                    : loopAtt.Name;                 // Use the Name specified by the Attribiute when it is declared
-                var proc = (Processor)(Activator.CreateInstance(procType, this));
-                ProcessorsInternal.Add(proc);
+            if (discover)
+                foreach (var procType in AppDomain.CurrentDomain.GetAssemblies()
+                    .SelectMany(a => a.GetTypes())
+                    .Where(t => t.IsSubclassOf(typeof(Processor))
+                        && t.IsAbstract == false
+                        && t.ContainsGenericParameters == false))
+                {
+                    var loopAtt = procType.GetCustomAttribute<JacinthProcessorAttribute>();
+                    var loopKey = loopAtt == null
+                        ? ProcessorLoop.UpdateLoopName  // Default to the "Update" loop when none is declared
+                        : loopAtt.Name;                 // Use the Name specified by the Attribiute when it is declared
+                    var proc = (Processor)(Activator.CreateInstance(procType, this));
+                    ProcessorsInternal.Add(proc);
 
-                GetOrCreateLoop(loopKey).AddProcessor(proc);
-            }
+                    GetOrCreateLoop(loopKey).AddProcessor(proc);
+                }
 
             // Perform first-time mass add of all entities to all processors
             foreach (var ent in Entities)
